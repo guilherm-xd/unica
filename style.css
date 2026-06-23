@@ -447,7 +447,10 @@ body {
   gap: 6px;
   font-size: clamp(0.7rem, 2vw, 0.9rem);
   line-height: 1;
-  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    color 0.2s;
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
 }
@@ -563,10 +566,36 @@ body {
   color: var(--text-muted);
   font-size: clamp(0.7rem, 2vw, 0.9rem);
   cursor: pointer;
-  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    color 0.2s;
 }
 .modal-content .close-help-btn:hover {
   background: var(--palette-btn-hover);
   border-color: var(--border-filled);
   color: var(--text);
+}
+
+.modal-credits {
+  margin-top: 1.2rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--border);
+  font-size: clamp(0.7rem, 1.8vw, 0.85rem);
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.6;
+}
+.modal-credits a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.modal-credits a:hover {
+  color: var(--text);
+  text-decoration: underline;
+}
+.modal-credits .credit-author {
+  display: block;
+  margin-top: 0.2rem;
 }

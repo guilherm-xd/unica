@@ -13352,11 +13352,11 @@ function render() {
         </div>
         <p>A letra <strong>U</strong> está na posição correta.</p>
         <div class="example">
-          <span class="letter-example">P</span>
+          <span class="letter-example">C</span>
           <span class="letter-example present">A</span>
-          <span class="letter-example">L</span>
+          <span class="letter-example">M</span>
           <span class="letter-example">A</span>
-          <span class="letter-example">V</span>
+          <span class="letter-example">S</span>
         </div>
         <p>A letra <strong>A</strong> faz parte da palavra, mas em outra posição.</p>
         <div class="example">
@@ -13368,6 +13368,13 @@ function render() {
         </div>
         <p>A letra <strong>G</strong> não faz parte da palavra.</p>
         <p>Os acentos são ignorados nas dicas. Você tem apenas <strong>uma chance</strong>, use-a com sabedoria!</p>
+
+        <!-- CRÉDITOS -->
+        <div class="modal-credits">
+          <span>Inspirado no <a href="https://term.ooo" target="_blank">Termo</a> e no <a href="https://www.nytimes.com/games/wordle" target="_blank">Wordle</a>.</span>
+          <span class="credit-author">Feito com ❤️ por mim, <a href="https://github.com/guilherm-xd" target="_blank">Guilherme</a>.</span>
+        </div>
+
         <button class="close-help-btn" id="closeHelpBtn2">Fechar</button>
       </div>
     </div>
@@ -13439,7 +13446,6 @@ window.addEventListener("keydown", (e) => {
   }
 });
 
-// Fechar modal ao clicar no overlay
 document.addEventListener("click", (e) => {
   const overlay = document.getElementById("helpModal");
   if (e.target === overlay) toggleHelp();
