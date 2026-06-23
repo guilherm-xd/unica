@@ -12738,28 +12738,27 @@ const Pf = [
   "jurar",
 ];
 
-function normalizeWord(w) {
-  return w
+function normalizar(palavra) {
+  return palavra
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toUpperCase();
 }
 
-const VALID_SET = new Set([...WORDS, ...Pf].map(normalizeWord));
+var CONJUNTO_VALIDO = new Set([...WORDS, ...Pf].map(normalizar));
 
-const EPOCH = Math.floor(Date.UTC(2024, 0, 1) / 86400000);
+var EPOCA = Math.floor(Date.UTC(2024, 0, 1) / 86400000);
 
-const ROW1 = ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"];
-const ROW2 = ["A", "S", "D", "F", "G", "H", "J", "K", "L"];
-const ROW3 = ["ENTER", "Z", "X", "C", "V", "B", "N", "M", "BACK"];
+var LINHA1 = ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"];
+var LINHA2 = ["A", "S", "D", "F", "G", "H", "J", "K", "L"];
+var LINHA3 = ["ENTER", "Z", "X", "C", "V", "B", "N", "M", "BACK"];
 
-const STORAGE_PREFIX = "unica_v1_";
+var PREFIXO_ARMAZENAMENTO = "unica_v1_";
+var PALETA_PADRAO = 1;
 
-const DEFAULT_PALETTE = 1;
-
-const PALETTES = [
+var PALETAS = [
   {
-    name: "Ferrugem",
+    nome: "Ferrugem",
     "--bg": "#15110f",
     "--tile-bg": "#1c1612",
     "--text": "#f2e9dd",
@@ -12791,7 +12790,7 @@ const PALETTES = [
     "--focus-ring": "#ff9a5c",
   },
   {
-    name: "Abismo",
+    nome: "Abismo",
     "--bg": "#0d1117",
     "--tile-bg": "#161b22",
     "--text": "#e6edf3",
@@ -12823,7 +12822,7 @@ const PALETTES = [
     "--focus-ring": "#58a6ff",
   },
   {
-    name: "Mata",
+    nome: "Mata",
     "--bg": "#0b1a12",
     "--tile-bg": "#102018",
     "--text": "#d8f0e0",
@@ -12855,7 +12854,7 @@ const PALETTES = [
     "--focus-ring": "#4caf7d",
   },
   {
-    name: "Pergaminho",
+    nome: "Pergaminho",
     "--bg": "#f5f0e8",
     "--tile-bg": "#ede5d5",
     "--text": "#2c2010",
@@ -12887,7 +12886,7 @@ const PALETTES = [
     "--focus-ring": "#a83212",
   },
   {
-    name: "Cobalto",
+    nome: "Cobalto",
     "--bg": "#09111d",
     "--tile-bg": "#101a2c",
     "--text": "#eaf2ff",
@@ -12919,7 +12918,7 @@ const PALETTES = [
     "--focus-ring": "#7ab1ff",
   },
   {
-    name: "Violeta",
+    nome: "Violeta",
     "--bg": "#130f1d",
     "--tile-bg": "#1b1528",
     "--text": "#f1e8ff",
@@ -12951,7 +12950,7 @@ const PALETTES = [
     "--focus-ring": "#bc96ff",
   },
   {
-    name: "Grafite",
+    nome: "Grafite",
     "--bg": "#111214",
     "--tile-bg": "#1a1c1f",
     "--text": "#f1f3f5",
@@ -12984,60 +12983,60 @@ const PALETTES = [
   },
 ];
 
-const state = {
-  phase: "loading",
-  targetWord: "",
-  dateKey: "",
-  guesses: [],
-  currentTiles: ["", "", "", "", ""],
-  cursorPos: 0,
-  message: "",
-  shake: false,
-  danger: false,
-  blockedWord: "",
-  blockedDate: "",
-  palette: 0,
-  prevTiles: ["", "", "", "", ""],
-  justSubmitted: false,
+var estado = {
+  fase: "carregando",
+  palavraAlvo: "",
+  chaveData: "",
+  palpites: [],
+  letrasAtuais: ["", "", "", "", ""],
+  posicaoCursor: 0,
+  mensagem: "",
+  treme: false,
+  perigo: false,
+  palavraBloqueada: "",
+  dataBloqueio: "",
+  paleta: 0,
+  letrasAnteriores: ["", "", "", "", ""],
+  acabouDeEnviar: false,
 };
 
-let messageTimer = null;
-let shakeTimer = null;
+var temporizadorMensagem = null;
+var temporizadorTreme = null;
 
-function lsGet(key) {
+function pegarStorage(chave) {
   try {
-    return localStorage.getItem(STORAGE_PREFIX + key);
+    return localStorage.getItem(PREFIXO_ARMAZENAMENTO + chave);
   } catch (e) {
     return null;
   }
 }
 
-function lsSet(key, val) {
+function guardarStorage(chave, valor) {
   try {
-    localStorage.setItem(STORAGE_PREFIX + key, val);
+    localStorage.setItem(PREFIXO_ARMAZENAMENTO + chave, valor);
   } catch (e) {}
 }
 
-function loadBlocked() {
-  const raw = lsGet("blocked");
+function carregarBloqueio() {
+  var raw = pegarStorage("blocked");
   if (!raw) return null;
   try {
-    const p = JSON.parse(raw);
+    var p = JSON.parse(raw);
     return p.blocked ? p : null;
   } catch (e) {
     return null;
   }
 }
 
-function saveBlocked(word, key) {
-  lsSet(
+function guardarBloqueio(palavra, chave) {
+  guardarStorage(
     "blocked",
-    JSON.stringify({ blocked: true, blockedWord: word, blockedDate: key }),
+    JSON.stringify({ blocked: true, blockedWord: palavra, blockedDate: chave }),
   );
 }
 
-function loadProgress(key) {
-  const raw = lsGet("progress_" + key);
+function carregarProgresso(chave) {
+  var raw = pegarStorage("progress_" + chave);
   if (!raw) return null;
   try {
     return JSON.parse(raw);
@@ -13046,457 +13045,528 @@ function loadProgress(key) {
   }
 }
 
-function saveProgress(key, data) {
-  lsSet("progress_" + key, JSON.stringify(data));
+function guardarProgresso(chave, dados) {
+  guardarStorage("progress_" + chave, JSON.stringify(dados));
 }
 
-function applyPalette(idx) {
-  const p = PALETTES[idx];
-  const root = document.documentElement;
-  Object.entries(p).forEach(([k, v]) => {
-    if (k !== "name") root.style.setProperty(k, v);
-  });
-  state.palette = idx;
-  lsSet("palette", String(idx));
+function aplicarPaleta(indice) {
+  var p = PALETAS[indice];
+  var root = document.documentElement;
+  for (var prop in p) {
+    if (prop !== "nome") root.style.setProperty(prop, p[prop]);
+  }
+  estado.paleta = indice;
+  guardarStorage("palette", String(indice));
 }
 
-function computeFeedback(guess, answer) {
-  const g = normalizeWord(guess);
-  const a = normalizeWord(answer);
-  const result = Array(5).fill("absent");
-  const used = Array(5).fill(false);
+function calcularFeedback(palpite, resposta) {
+  var g = normalizar(palpite);
+  var a = normalizar(resposta);
+  var resultado = Array(5).fill("ausente");
+  var usado = Array(5).fill(false);
 
-  for (let i = 0; i < 5; i++) {
+  for (var i = 0; i < 5; i++) {
     if (g[i] === a[i]) {
-      result[i] = "correct";
-      used[i] = true;
+      resultado[i] = "certo";
+      usado[i] = true;
     }
   }
 
-  for (let i = 0; i < 5; i++) {
-    if (result[i] === "correct") continue;
-    const idx = a.split("").findIndex((ch, j) => ch === g[i] && !used[j]);
+  for (var i = 0; i < 5; i++) {
+    if (resultado[i] === "certo") continue;
+    var idx = a.split("").findIndex(function (ch, j) {
+      return ch === g[i] && !usado[j];
+    });
     if (idx !== -1) {
-      result[i] = "present";
-      used[idx] = true;
+      resultado[i] = "presente";
+      usado[idx] = true;
     }
   }
 
-  return result;
+  return resultado;
 }
 
-function getKeyStatuses() {
-  const rank = { correct: 3, present: 2, absent: 1 };
-  const map = {};
+function obterStatusTeclas() {
+  var ordem = { certo: 3, presente: 2, ausente: 1 };
+  var mapa = {};
 
-  state.guesses.forEach((g) => {
-    g.word.split("").forEach((ch, i) => {
-      const s = g.feedback[i];
-      if (!map[ch] || rank[s] > rank[map[ch]]) map[ch] = s;
-    });
+  estado.palpites.forEach(function (p) {
+    var letras = p.palavra.split("");
+    for (var i = 0; i < letras.length; i++) {
+      var ch = letras[i];
+      var s = p.feedback[i];
+      if (!mapa[ch] || ordem[s] > ordem[mapa[ch]]) mapa[ch] = s;
+    }
   });
 
-  return map;
+  return mapa;
 }
 
-function showMessage(msg, danger) {
-  state.message = msg;
-  state.danger = !!danger;
-  clearTimeout(messageTimer);
-  messageTimer = setTimeout(() => {
-    state.message = "";
-    render();
+function mostrarMensagem(msg, perigo) {
+  estado.mensagem = msg;
+  estado.perigo = !!perigo;
+  clearTimeout(temporizadorMensagem);
+  temporizadorMensagem = setTimeout(function () {
+    estado.mensagem = "";
+    renderizar();
   }, 1800);
 }
 
-function triggerShake(msg) {
-  showMessage(msg, false);
-  state.shake = true;
-  clearTimeout(shakeTimer);
-  shakeTimer = setTimeout(() => {
-    state.shake = false;
-    render();
+function tremer(msg) {
+  mostrarMensagem(msg, false);
+  estado.treme = true;
+  clearTimeout(temporizadorTreme);
+  temporizadorTreme = setTimeout(function () {
+    estado.treme = false;
+    renderizar();
   }, 500);
-  render();
+  renderizar();
 }
 
-function handleLetter(letter) {
-  state.currentTiles[state.cursorPos] = letter;
-  for (let i = state.cursorPos + 1; i < 5; i++) {
-    if (!state.currentTiles[i]) {
-      state.cursorPos = i;
+function lidarComLetra(letra) {
+  estado.letrasAtuais[estado.posicaoCursor] = letra;
+  for (var i = estado.posicaoCursor + 1; i < 5; i++) {
+    if (!estado.letrasAtuais[i]) {
+      estado.posicaoCursor = i;
       return;
     }
   }
 }
 
-function handleBackspace() {
-  if (state.currentTiles[state.cursorPos]) {
-    state.currentTiles[state.cursorPos] = "";
-  } else if (state.cursorPos > 0) {
-    state.cursorPos--;
-    state.currentTiles[state.cursorPos] = "";
+function lidarComBackspace() {
+  if (estado.letrasAtuais[estado.posicaoCursor]) {
+    estado.letrasAtuais[estado.posicaoCursor] = "";
+  } else if (estado.posicaoCursor > 0) {
+    estado.posicaoCursor--;
+    estado.letrasAtuais[estado.posicaoCursor] = "";
   }
 }
 
-function submitGuess() {
-  if (state.phase !== "playing") return;
+function enviarPalpite() {
+  if (estado.fase !== "jogando") return;
 
-  if (state.currentTiles.some((t) => !t)) {
-    triggerShake("faltam letras.");
+  if (
+    estado.letrasAtuais.some(function (t) {
+      return !t;
+    })
+  ) {
+    tremer("faltam letras.");
     return;
   }
 
-  const guess = state.currentTiles.join("");
-  const guessNorm = normalizeWord(guess);
-  if (!VALID_SET.has(guessNorm)) {
-    triggerShake("essa palavra nao esta na lista.");
+  var palpite = estado.letrasAtuais.join("");
+  var palpiteNorm = normalizar(palpite);
+  if (!CONJUNTO_VALIDO.has(palpiteNorm)) {
+    tremer("essa palavra nao esta na lista.");
     return;
   }
 
-  const feedback = computeFeedback(guess, state.targetWord);
-  const newGuesses = [...state.guesses, { word: guess, feedback }];
-  const won = guessNorm === normalizeWord(state.targetWord);
+  var feedback = calcularFeedback(palpite, estado.palavraAlvo);
+  var novosPalpites = estado.palpites.concat([
+    { palavra: palpite, feedback: feedback },
+  ]);
+  var venceu = palpiteNorm === normalizar(estado.palavraAlvo);
 
-  state.guesses = newGuesses;
-  state.justSubmitted = true;
-  state.currentTiles = ["", "", "", "", ""];
-  state.cursorPos = 0;
-  state.prevTiles = ["", "", "", "", ""];
+  estado.palpites = novosPalpites;
+  estado.acabouDeEnviar = true;
+  estado.letrasAtuais = ["", "", "", "", ""];
+  estado.posicaoCursor = 0;
+  estado.letrasAnteriores = ["", "", "", "", ""];
 
-  if (won) {
-    state.phase = "won";
-    showMessage("encontrada.", false);
-    saveProgress(state.dateKey, {
-      guesses: newGuesses,
-      status: "won",
+  if (venceu) {
+    estado.fase = "ganhou";
+    mostrarMensagem("encontrada.", false);
+    guardarProgresso(estado.chaveData, {
+      palpites: novosPalpites,
+      status: "ganhou",
     });
-  } else if (newGuesses.length >= 6) {
-    state.phase = "locking";
-    showMessage("essa era a sua ultima tentativa.", true);
-    saveProgress(state.dateKey, {
-      guesses: newGuesses,
-      status: "lost",
+  } else if (novosPalpites.length >= 6) {
+    estado.fase = "travando";
+    mostrarMensagem("essa era a sua ultima tentativa.", true);
+    guardarProgresso(estado.chaveData, {
+      palpites: novosPalpites,
+      status: "perdeu",
     });
-    setTimeout(() => {
-      saveBlocked(state.targetWord, state.dateKey);
-      state.blockedWord = state.targetWord;
-      state.blockedDate = state.dateKey;
-      state.phase = "blocked";
-      render();
+    setTimeout(function () {
+      guardarBloqueio(estado.palavraAlvo, estado.chaveData);
+      estado.palavraBloqueada = estado.palavraAlvo;
+      estado.dataBloqueio = estado.chaveData;
+      estado.fase = "bloqueado";
+      renderizar();
     }, 1700);
   } else {
-    saveProgress(state.dateKey, {
-      guesses: newGuesses,
-      status: "playing",
+    guardarProgresso(estado.chaveData, {
+      palpites: novosPalpites,
+      status: "jogando",
     });
   }
 
-  render();
+  renderizar();
 }
 
-function pressKey(k) {
-  if (state.phase !== "playing") return;
-  if (k === "ENTER") return submitGuess();
+function pressionarTecla(k) {
+  if (estado.fase !== "jogando") return;
+  if (k === "ENTER") return enviarPalpite();
   if (k === "BACK") {
-    handleBackspace();
-    render();
+    lidarComBackspace();
+    renderizar();
     return;
   }
-  handleLetter(k);
-  render();
+  lidarComLetra(k);
+  renderizar();
 }
 
-function tileHTML(letter, cls, delay, isRevealing) {
-  let classes = cls;
-  if (isRevealing && cls) classes += " reveal";
-  const animStyle =
-    isRevealing && cls ? ` style="animation-delay:${delay}ms"` : "";
-  return `<div class="tile ${classes}"${animStyle}>${letter}</div>`;
+function htmlQuadrado(letra, classe, atraso, revelando) {
+  var classes = classe;
+  if (revelando && classe) classes += " revelar";
+  var estiloAnim =
+    revelando && classe ? ' style="animation-delay:' + atraso + 'ms"' : "";
+  return (
+    '<div class="quadrado ' +
+    classes +
+    '"' +
+    estiloAnim +
+    ">" +
+    letra +
+    "</div>"
+  );
 }
 
-function boardHTML() {
-  let rows = "";
+function htmlTabuleiro() {
+  var linhas = "";
 
-  for (let r = 0; r < 6; r++) {
-    const done = state.guesses[r];
-    const isActive = r === state.guesses.length && state.phase === "playing";
-    let cells = "";
+  for (var r = 0; r < 6; r++) {
+    var feito = estado.palpites[r];
+    var ativa = r === estado.palpites.length && estado.fase === "jogando";
+    var celulas = "";
 
-    if (done) {
-      const isLast = r === state.guesses.length - 1;
-      const isRevealing = isLast && state.justSubmitted;
-      for (let c = 0; c < 5; c++) {
-        cells += tileHTML(done.word[c], done.feedback[c], c * 90, isRevealing);
+    if (feito) {
+      var ultima = r === estado.palpites.length - 1;
+      var revelando = ultima && estado.acabouDeEnviar;
+      for (var c = 0; c < 5; c++) {
+        celulas += htmlQuadrado(
+          feito.palavra[c],
+          feito.feedback[c],
+          c * 90,
+          revelando,
+        );
       }
-    } else if (isActive) {
-      for (let c = 0; c < 5; c++) {
-        const ch = state.currentTiles[c] || "";
-        const isCursor = c === state.cursorPos;
-        let cls = ch ? "filled" : "";
-        if (isCursor) cls = cls ? cls + " cursor" : "cursor";
-        const wasEmpty = state.prevTiles[c] === "";
-        const isNowFilled = ch !== "";
-        if (isNowFilled && wasEmpty) {
-          cls = cls ? cls + " pop-in" : "pop-in";
+    } else if (ativa) {
+      for (var c = 0; c < 5; c++) {
+        var ch = estado.letrasAtuais[c] || "";
+        var cursor = c === estado.posicaoCursor;
+        var classe = ch ? "preenchido" : "";
+        if (cursor) classe = classe ? classe + " curso" : "curso";
+        var vazioAntes = estado.letrasAnteriores[c] === "";
+        var agoraPreenchido = ch !== "";
+        if (agoraPreenchido && vazioAntes) {
+          classe = classe ? classe + " entrando" : "entrando";
         }
-        cells += `<div class="tile ${cls}" data-row="${r}" data-col="${c}">${ch}</div>`;
+        celulas +=
+          '<div class="quadrado ' +
+          classe +
+          '" data-row="' +
+          r +
+          '" data-col="' +
+          c +
+          '">' +
+          ch +
+          "</div>";
       }
     } else {
-      for (let c = 0; c < 5; c++) {
-        cells += tileHTML("", "", 0, false);
+      for (var c = 0; c < 5; c++) {
+        celulas += htmlQuadrado("", "", 0, false);
       }
     }
 
-    rows += `<div class="row">${cells}</div>`;
+    linhas += '<div class="linha">' + celulas + "</div>";
   }
 
-  return `<div class="board">${rows}</div>`;
+  return '<div class="tabuleiro">' + linhas + "</div>";
 }
 
-function keyboardHTML() {
-  const statuses = getKeyStatuses();
-  const disabled = state.phase !== "playing";
+function htmlTeclado() {
+  var statuses = obterStatusTeclas();
+  var desabilitado = estado.fase !== "jogando";
 
-  const btn = (k) => {
-    const label = k === "ENTER" ? "↵" : k === "BACK" ? "⌫" : k;
-    const wide = k === "ENTER" || k === "BACK" ? "wide" : "";
-    const cls = statuses[k] || "";
-    return `<button type="button" class="key ${wide} ${cls}" data-k="${k}" ${disabled ? "disabled" : ""}>${label}</button>`;
-  };
+  function botao(k) {
+    var rotulo = k === "ENTER" ? "↵" : k === "BACK" ? "⌫" : k;
+    var larga = k === "ENTER" || k === "BACK" ? "larga" : "";
+    var classe = statuses[k] || "";
+    return (
+      '<button type="button" class="tecla ' +
+      larga +
+      " " +
+      classe +
+      '" data-k="' +
+      k +
+      '" ' +
+      (desabilitado ? "disabled" : "") +
+      ">" +
+      rotulo +
+      "</button>"
+    );
+  }
 
-  const row = (keys) => `<div class="kbRow">${keys.map(btn).join("")}</div>`;
-  return `<div class="keyboard">${row(ROW1)}${row(ROW2)}${row(ROW3)}</div>`;
+  function linha(teclas) {
+    return (
+      '<div class="linha-teclado">' + teclas.map(botao).join("") + "</div>"
+    );
+  }
+
+  return (
+    '<div class="teclado">' +
+    linha(LINHA1) +
+    linha(LINHA2) +
+    linha(LINHA3) +
+    "</div>"
+  );
 }
 
-function dotsHTML() {
-  return `<div class="dots">${Array.from(
-    { length: 6 },
-    (_, i) =>
-      `<div class="dot ${i < state.guesses.length ? "used" : ""}"></div>`,
-  ).join("")}</div>`;
+function htmlPontos() {
+  var pontos = "";
+  for (var i = 0; i < 6; i++) {
+    var usado = i < estado.palpites.length ? "usado" : "";
+    pontos += '<div class="ponto ' + usado + '"></div>';
+  }
+  return '<div class="pontos">' + pontos + "</div>";
 }
 
-function paletteButtonHTML() {
-  const name = PALETTES[state.palette].name;
-  return `<button class="paletteBtn" id="paletteBtn" title="Paleta: ${name} — clique para mudar">🎨 <span class="paletteSwatch"></span></button>`;
+function htmlBotaoPaleta() {
+  var nome = PALETAS[estado.paleta].nome;
+  return (
+    '<button class="btn-paleta" id="btnPaleta" title="Paleta: ' +
+    nome +
+    ' — clique para mudar">🎨 <span class="amostra-cor"></span></button>'
+  );
 }
 
-function helpButtonHTML() {
-  return `<button class="helpBtn" id="helpBtn" title="Como jogar">?</button>`;
+function htmlBotaoAjuda() {
+  return '<button class="btn-ajuda" id="btnAjuda" title="Como jogar">?</button>';
 }
 
-function toggleHelp() {
-  const overlay = document.getElementById("helpModal");
-  overlay.classList.toggle("open");
+function alternarAjuda() {
+  var overlay = document.getElementById("modalAjuda");
+  overlay.classList.toggle("aberto");
 }
 
-function render() {
-  const root = document.getElementById("root");
+function renderizar() {
+  var root = document.getElementById("root");
   if (!root) return;
 
-  if (state.phase === "loading") {
-    root.innerHTML = `<div class="loadingScreen">carregando…</div>`;
+  if (estado.fase === "carregando") {
+    root.innerHTML = '<div class="loadingScreen">carregando…</div>';
     return;
   }
 
-  if (state.phase === "blocked") {
+  if (estado.fase === "bloqueado") {
     root.innerHTML = `
-      <div class="blockedScreen">
-        <div class="blockedTitle">adeus.</div>
-        <div class="blockedWord">${state.blockedWord}</div>
-        <div class="blockedText">voce usou sua unica chance e errou. essa palavra continuara unica para sempre, e este jogo nao vai mais ser jogavel neste dispositivo.</div>
-        <div class="blockedFooter">perdido em ${state.blockedDate}</div>
+      <div class="tela-bloqueada">
+        <div class="titulo-bloqueio">adeus.</div>
+        <div class="palavra-bloqueada">${estado.palavraBloqueada}</div>
+        <div class="texto-bloqueio">voce usou sua unica chance e errou. essa palavra continuara unica para sempre, e este jogo nao vai mais ser jogavel neste dispositivo.</div>
+        <div class="rodape-bloqueio">perdido em ${estado.dataBloqueio}</div>
       </div>`;
     return;
   }
 
-  const toast = state.message
-    ? `<div class="toast ${state.shake ? "shake" : ""} ${state.danger ? "danger" : ""}">${state.message}</div>`
+  var toast = estado.mensagem
+    ? '<div class="mensagem ' +
+      (estado.treme ? "tremida" : "") +
+      (estado.perigo ? " perigo" : "") +
+      '">' +
+      estado.mensagem +
+      "</div>"
     : "";
 
-  const winBanner =
-    state.phase === "won"
-      ? `<div class="winBanner">encontrada em ${state.guesses.length} ${state.guesses.length === 1 ? "tentativa" : "tentativas"}: <b>${state.targetWord}</b><br>volte amanha para a proxima palavra.</div>`
+  var bannerVitoria =
+    estado.fase === "ganhou"
+      ? '<div class="banner-vitoria">encontrada em ' +
+        estado.palpites.length +
+        " " +
+        (estado.palpites.length === 1 ? "tentativa" : "tentativas") +
+        ": <b>" +
+        estado.palavraAlvo +
+        "</b><br>volte amanha para a proxima palavra.</div>"
       : "";
 
   root.innerHTML = `
-    <div class="game">
-      <div class="header">
-        ${helpButtonHTML()}
-        ${paletteButtonHTML()}
-        <div class="title">ÚNICA</div>
-        <div class="subtitle">uma palavra por dia, apenas uma chance.</div>
-        ${dotsHTML()}
+    <div class="jogo">
+      <div class="cabecalho">
+        ${htmlBotaoAjuda()}
+        ${htmlBotaoPaleta()}
+        <div class="titulo">ÚNICA</div>
+        <div class="subtitulo">uma palavra por dia, apenas uma chance.</div>
+        ${htmlPontos()}
       </div>
       ${toast}
-      ${boardHTML()}
-      ${winBanner}
-      ${keyboardHTML()}
+      ${htmlTabuleiro()}
+      ${bannerVitoria}
+      ${htmlTeclado()}
     </div>
-    <div id="helpModal" class="modal-overlay">
-      <div class="modal-content">
-        <button class="close-btn" id="closeHelpBtn">&times;</button>
+    <div id="modalAjuda" class="modal-ajuda">
+      <div class="caixa-modal">
+        <button class="fechar" id="fecharAjuda">&times;</button>
         <h2>Como jogar</h2>
         <p>Descubra a palavra certa em até 6 tentativas. Depois de cada tentativa, as peças mostram o quão perto você está da solução.
         <br>
         <br>
         Caso você não consiga adivinhar a palavra, você perderá o jogo e nunca mais conseguirá jogá-lo neste dispositivo.</p>
         <p>Exemplos:</p>
-        <div class="example">
-          <span class="letter-example correct">U</span>
-          <span class="letter-example">N</span>
-          <span class="letter-example">I</span>
-          <span class="letter-example">C</span>
-          <span class="letter-example">A</span>
+        <div class="exemplo">
+          <span class="letra-exemplo certo">U</span>
+          <span class="letra-exemplo">N</span>
+          <span class="letra-exemplo">I</span>
+          <span class="letra-exemplo">C</span>
+          <span class="letra-exemplo">A</span>
         </div>
         <p>A letra <strong>U</strong> está na posição correta.</p>
-        <div class="example">
-          <span class="letter-example">C</span>
-          <span class="letter-example present">A</span>
-          <span class="letter-example">M</span>
-          <span class="letter-example">A</span>
-          <span class="letter-example">S</span>
+        <div class="exemplo">
+          <span class="letra-exemplo">C</span>
+          <span class="letra-exemplo presente">A</span>
+          <span class="letra-exemplo">M</span>
+          <span class="letra-exemplo">A</span>
+          <span class="letra-exemplo">S</span>
         </div>
         <p>A letra <strong>A</strong> faz parte da palavra, mas em outra posição.</p>
-        <div class="example">
-          <span class="letter-example">C</span>
-          <span class="letter-example">A</span>
-          <span class="letter-example">R</span>
-          <span class="letter-example absent">G</span>
-          <span class="letter-example">O</span>
+        <div class="exemplo">
+          <span class="letra-exemplo">C</span>
+          <span class="letra-exemplo">A</span>
+          <span class="letra-exemplo">R</span>
+          <span class="letra-exemplo ausente">G</span>
+          <span class="letra-exemplo">O</span>
         </div>
         <p>A letra <strong>G</strong> não faz parte da palavra.</p>
         <p>Os acentos são ignorados nas dicas. Você tem apenas <strong>uma chance</strong>, use-a com sabedoria!</p>
 
-        <!-- CRÉDITOS -->
-        <div class="modal-credits">
+        <div class="creditos">
           <span>Inspirado no <a href="https://term.ooo" target="_blank">Termo</a> e no <a href="https://www.nytimes.com/games/wordle" target="_blank">Wordle</a>.</span>
-          <span class="credit-author">Feito com ❤️ por mim, <a href="https://github.com/guilherm-xd" target="_blank">Guilherme</a>.</span>
+          <span class="autor">Feito com ❤️ por mim, <a href="https://github.com/guilherm-xd" target="_blank">Guilherme</a>.</span>
         </div>
 
-        <button class="close-help-btn" id="closeHelpBtn2">Fechar</button>
+        <button class="fechar-ajuda" id="fecharAjuda2">Fechar</button>
       </div>
     </div>
   `;
 
-  state.prevTiles = [...state.currentTiles];
-  state.justSubmitted = false;
+  estado.letrasAnteriores = estado.letrasAtuais.slice();
+  estado.acabouDeEnviar = false;
 }
 
-document.addEventListener("click", (e) => {
-  if (e.target.closest("#paletteBtn")) {
-    state.palette = (state.palette + 1) % PALETTES.length;
-    applyPalette(state.palette);
-    render();
+document.addEventListener("click", function (e) {
+  if (e.target.closest("#btnPaleta")) {
+    estado.paleta = (estado.paleta + 1) % PALETAS.length;
+    aplicarPaleta(estado.paleta);
+    renderizar();
     return;
   }
 
   if (
-    e.target.closest("#helpBtn") ||
-    e.target.closest("#closeHelpBtn") ||
-    e.target.closest("#closeHelpBtn2")
+    e.target.closest("#btnAjuda") ||
+    e.target.closest("#fecharAjuda") ||
+    e.target.closest("#fecharAjuda2")
   ) {
-    toggleHelp();
+    alternarAjuda();
     return;
   }
 
-  const tile = e.target.closest(".tile[data-row]");
-  if (tile && state.phase === "playing") {
-    state.cursorPos = parseInt(tile.dataset.col, 10);
-    render();
+  var quadrado = e.target.closest(".quadrado[data-row]");
+  if (quadrado && estado.fase === "jogando") {
+    estado.posicaoCursor = parseInt(quadrado.dataset.col, 10);
+    renderizar();
     return;
   }
 
-  const btn = e.target.closest(".key");
-  if (btn && !btn.disabled) pressKey(btn.dataset.k);
+  var tecla = e.target.closest(".tecla");
+  if (tecla && !tecla.disabled) pressionarTecla(tecla.dataset.k);
 });
 
-window.addEventListener("keydown", (e) => {
-  if (state.phase !== "playing") return;
+window.addEventListener("keydown", function (e) {
+  if (estado.fase !== "jogando") return;
 
   if (e.key === "Enter") {
-    submitGuess();
+    enviarPalpite();
     return;
   }
 
   if (e.key === "Backspace") {
-    handleBackspace();
-    render();
+    lidarComBackspace();
+    renderizar();
     return;
   }
 
   if (e.key === "ArrowLeft") {
     e.preventDefault();
-    state.cursorPos = Math.max(0, state.cursorPos - 1);
-    render();
+    estado.posicaoCursor = Math.max(0, estado.posicaoCursor - 1);
+    renderizar();
     return;
   }
 
   if (e.key === "ArrowRight") {
     e.preventDefault();
-    state.cursorPos = Math.min(4, state.cursorPos + 1);
-    render();
+    estado.posicaoCursor = Math.min(4, estado.posicaoCursor + 1);
+    renderizar();
     return;
   }
 
   if (/^[a-zA-Z]$/.test(e.key)) {
-    handleLetter(e.key.toUpperCase());
-    render();
+    lidarComLetra(e.key.toUpperCase());
+    renderizar();
   }
 });
 
-document.addEventListener("click", (e) => {
-  const overlay = document.getElementById("helpModal");
-  if (e.target === overlay) toggleHelp();
+document.addEventListener("click", function (e) {
+  var overlay = document.getElementById("modalAjuda");
+  if (e.target === overlay) alternarAjuda();
 });
 
-function init() {
-  const savedPalette = parseInt(
-    lsGet("palette") || String(DEFAULT_PALETTE),
+function iniciar() {
+  var paletaSalva = parseInt(
+    pegarStorage("palette") || String(PALETA_PADRAO),
     10,
   );
-  state.palette = isNaN(savedPalette)
-    ? DEFAULT_PALETTE
-    : Math.min(Math.max(savedPalette, 0), PALETTES.length - 1);
-  applyPalette(state.palette);
+  estado.paleta = isNaN(paletaSalva)
+    ? PALETA_PADRAO
+    : Math.min(Math.max(paletaSalva, 0), PALETAS.length - 1);
+  aplicarPaleta(estado.paleta);
 
-  const blocked = loadBlocked();
-  if (blocked) {
-    state.blockedWord = blocked.blockedWord || "?????";
-    state.blockedDate = blocked.blockedDate || "";
-    state.phase = "blocked";
-    render();
+  var bloqueado = carregarBloqueio();
+  if (bloqueado) {
+    estado.palavraBloqueada = bloqueado.blockedWord || "?????";
+    estado.dataBloqueio = bloqueado.blockedDate || "";
+    estado.fase = "bloqueado";
+    renderizar();
     return;
   }
 
-  const now = new Date();
-  const y = now.getFullYear();
-  const m = now.getMonth();
-  const d = now.getDate();
+  var agora = new Date();
+  var y = agora.getFullYear();
+  var m = agora.getMonth();
+  var d = agora.getDate();
 
-  const today = Math.floor(Date.UTC(y, m, d) / 86400000);
-  const dn = today - EPOCH + 1;
-  const answerList = Pf;
-  const idx =
-    (((dn - 1) % answerList.length) + answerList.length) % answerList.length;
-  const word = answerList[idx];
-  const key =
+  var hoje = Math.floor(Date.UTC(y, m, d) / 86400000);
+  var dn = hoje - EPOCA + 1;
+  var listaRespostas = Pf;
+  var idx =
+    (((dn - 1) % listaRespostas.length) + listaRespostas.length) %
+    listaRespostas.length;
+  var palavra = listaRespostas[idx];
+  var chave =
     y + "-" + String(m + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0");
 
-  const progress = loadProgress(key);
+  var progresso = carregarProgresso(chave);
 
-  state.targetWord = word;
-  state.dateKey = key;
+  estado.palavraAlvo = palavra;
+  estado.chaveData = chave;
 
-  if (progress) {
-    state.guesses = progress.guesses || [];
-    state.phase = progress.status === "won" ? "won" : "playing";
+  if (progresso) {
+    estado.palpites = progresso.palpites || [];
+    estado.fase = progresso.status === "ganhou" ? "ganhou" : "jogando";
   } else {
-    state.phase = "playing";
+    estado.fase = "jogando";
   }
 
-  render();
+  renderizar();
 }
 
-init();
+iniciar();
