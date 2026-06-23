@@ -11,6 +11,7 @@ Feito para quem gosta de desafios diários e quer testar seu vocabulário de for
 Esse jogo nasceu da vontade de criar algo simples, bonito e desafiador para o dia a dia. Diferente de outros jogos de palavra, a pressão é mais forte, já que você não pode errar. Cada dia é uma nova palavra, e se você não acertar em 6 tentativas, o jogo se encerra.
 
 A interface foi pensada para ser limpa, com temas visuais que mudam de acordo com o seu gosto (paletas de cores).
+
 ---
 
 ## Funcionalidades
