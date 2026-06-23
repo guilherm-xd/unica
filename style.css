@@ -430,3 +430,143 @@ body {
   flex-shrink: 0;
   transition: background 0.3s;
 }
+
+/* Botão de ajuda "?" */
+.helpBtn {
+  position: absolute;
+  top: clamp(4px, 1vh, 10px);
+  left: clamp(4px, 1vw, 12px);
+  background: var(--palette-btn-bg);
+  border: 1px solid var(--palette-btn-border);
+  border-radius: 30px;
+  color: var(--text-muted);
+  padding: 6px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: clamp(0.7rem, 2vw, 0.9rem);
+  line-height: 1;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.helpBtn:hover {
+  background: var(--palette-btn-hover);
+  border-color: var(--border-filled);
+  color: var(--text);
+}
+
+/* Modal de ajuda */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.modal-overlay.open {
+  display: flex;
+}
+.modal-content {
+  background: var(--bg);
+  color: var(--text);
+  padding: 2rem 2rem 1.5rem;
+  border-radius: 12px;
+  max-width: 440px;
+  width: 90%;
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal-content h2 {
+  font-family: "Bitter", serif;
+  font-size: 1.8rem;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+  text-align: center;
+}
+.modal-content .close-btn {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.8rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 4px;
+}
+.modal-content .close-btn:hover {
+  color: var(--text);
+}
+.modal-content p {
+  font-size: clamp(0.8rem, 2vw, 1rem);
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin: 0.5rem 0;
+}
+.modal-content .example {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin: 12px 0;
+}
+.modal-content .letter-example {
+  width: 2.2rem;
+  height: 2.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 700;
+  font-size: 1.2rem;
+  border-radius: 4px;
+  background: var(--tile-bg);
+  border: 2px solid var(--border);
+  color: var(--text);
+  text-transform: uppercase;
+}
+.modal-content .letter-example.correct {
+  background: var(--correct);
+  border-color: var(--correct);
+  color: var(--correct-text);
+}
+.modal-content .letter-example.present {
+  background: var(--present);
+  border-color: var(--present);
+  color: var(--present-text);
+}
+.modal-content .letter-example.absent {
+  background: var(--absent-bg);
+  border-color: var(--absent-border);
+  color: var(--absent-text);
+}
+.modal-content .close-help-btn {
+  display: block;
+  margin: 1.2rem auto 0;
+  padding: 8px 24px;
+  background: var(--palette-btn-bg);
+  border: 1px solid var(--palette-btn-border);
+  border-radius: 30px;
+  color: var(--text-muted);
+  font-size: clamp(0.7rem, 2vw, 0.9rem);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+.modal-content .close-help-btn:hover {
+  background: var(--palette-btn-hover);
+  border-color: var(--border-filled);
+  color: var(--text);
+}

@@ -13282,6 +13282,15 @@ function paletteButtonHTML() {
   return `<button class="paletteBtn" id="paletteBtn" title="Paleta: ${name} — clique para mudar">🎨 <span class="paletteSwatch"></span></button>`;
 }
 
+function helpButtonHTML() {
+  return `<button class="helpBtn" id="helpBtn" title="Como jogar">?</button>`;
+}
+
+function toggleHelp() {
+  const overlay = document.getElementById("helpModal");
+  overlay.classList.toggle("open");
+}
+
 function render() {
   const root = document.getElementById("root");
   if (!root) return;
@@ -13314,6 +13323,7 @@ function render() {
   root.innerHTML = `
     <div class="game">
       <div class="header">
+        ${helpButtonHTML()}
         ${paletteButtonHTML()}
         <div class="title">ÚNICA</div>
         <div class="subtitle">uma palavra por dia, apenas uma chance.</div>
@@ -13323,7 +13333,45 @@ function render() {
       ${boardHTML()}
       ${winBanner}
       ${keyboardHTML()}
-    </div>`;
+    </div>
+    <div id="helpModal" class="modal-overlay">
+      <div class="modal-content">
+        <button class="close-btn" id="closeHelpBtn">&times;</button>
+        <h2>Como jogar</h2>
+        <p>Descubra a palavra certa em até 6 tentativas. Depois de cada tentativa, as peças mostram o quão perto você está da solução.
+        <br>
+        <br>
+        Caso você não consiga adivinhar a palavra, você perderá o jogo e nunca mais conseguirá jogá-lo neste dispositivo.</p>
+        <p>Exemplos:</p>
+        <div class="example">
+          <span class="letter-example correct">U</span>
+          <span class="letter-example">N</span>
+          <span class="letter-example">I</span>
+          <span class="letter-example">C</span>
+          <span class="letter-example">A</span>
+        </div>
+        <p>A letra <strong>U</strong> está na posição correta.</p>
+        <div class="example">
+          <span class="letter-example">P</span>
+          <span class="letter-example present">A</span>
+          <span class="letter-example">L</span>
+          <span class="letter-example">A</span>
+          <span class="letter-example">V</span>
+        </div>
+        <p>A letra <strong>A</strong> faz parte da palavra, mas em outra posição.</p>
+        <div class="example">
+          <span class="letter-example">C</span>
+          <span class="letter-example">A</span>
+          <span class="letter-example">R</span>
+          <span class="letter-example absent">G</span>
+          <span class="letter-example">O</span>
+        </div>
+        <p>A letra <strong>G</strong> não faz parte da palavra.</p>
+        <p>Os acentos são ignorados nas dicas. Você tem apenas <strong>uma chance</strong>, use-a com sabedoria!</p>
+        <button class="close-help-btn" id="closeHelpBtn2">Fechar</button>
+      </div>
+    </div>
+  `;
 
   state.prevTiles = [...state.currentTiles];
   state.justSubmitted = false;
@@ -13334,6 +13382,15 @@ document.addEventListener("click", (e) => {
     state.palette = (state.palette + 1) % PALETTES.length;
     applyPalette(state.palette);
     render();
+    return;
+  }
+
+  if (
+    e.target.closest("#helpBtn") ||
+    e.target.closest("#closeHelpBtn") ||
+    e.target.closest("#closeHelpBtn2")
+  ) {
+    toggleHelp();
     return;
   }
 
@@ -13380,6 +13437,12 @@ window.addEventListener("keydown", (e) => {
     handleLetter(e.key.toUpperCase());
     render();
   }
+});
+
+// Fechar modal ao clicar no overlay
+document.addEventListener("click", (e) => {
+  const overlay = document.getElementById("helpModal");
+  if (e.target === overlay) toggleHelp();
 });
 
 function init() {
