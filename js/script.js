@@ -13182,7 +13182,7 @@ function enviarPalpite() {
     });
   } else if (novosPalpites.length >= 6) {
     estado.fase = "travando";
-    mostrarMensagem("essa era a sua ultima tentativa.", true);
+    mostrarMensagem("essa era a sua única tentativa.", true);
     guardarProgresso(estado.chaveData, {
       palpites: novosPalpites,
       status: "perdeu",
@@ -13364,7 +13364,7 @@ function renderizar() {
       <div class="tela-bloqueada">
         <div class="titulo-bloqueio">adeus.</div>
         <div class="palavra-bloqueada">${estado.palavraBloqueada}</div>
-        <div class="texto-bloqueio">voce usou sua unica chance e errou. essa palavra continuara unica para sempre, e este jogo nao vai mais ser jogavel neste dispositivo.</div>
+        <div class="texto-bloqueio">você usou sua única chance e errou. essa palavra continuará única para sempre, e ÚNICA não vai mais ser jogável neste dispositivo.</div>
         <div class="rodape-bloqueio">perdido em ${estado.dataBloqueio}</div>
       </div>`;
     return;
