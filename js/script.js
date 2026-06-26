@@ -13387,7 +13387,7 @@ function renderizar() {
         (estado.palpites.length === 1 ? "tentativa" : "tentativas") +
         ": <b>" +
         estado.palavraAlvo +
-        "</b><br>volte amanha para a proxima palavra.</div>"
+        "</b><br>volte amanhã para a próxima palavra.</div>"
       : "";
 
   root.innerHTML = `
