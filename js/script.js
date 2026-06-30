@@ -12979,6 +12979,12 @@ function guardarStorage(chave, valor) {
   } catch (e) {}
 }
 
+function removerStorage(chave) {
+  try {
+    localStorage.removeItem(PREFIXO_ARMAZENAMENTO + chave);
+  } catch (e) {}
+}
+
 function carregarBloqueio() {
   var raw = pegarStorage("blocked");
   if (!raw) return null;
@@ -13009,6 +13015,10 @@ function carregarProgresso(chave) {
 
 function guardarProgresso(chave, dados) {
   guardarStorage("progress_" + chave, JSON.stringify(dados));
+}
+
+function limparProgresso(chave) {
+  removerStorage("progress_" + chave);
 }
 
 function aplicarPaleta(indice) {
@@ -13046,6 +13056,35 @@ function calcularFeedback(palpite, resposta) {
   }
 
   return resultado;
+}
+
+function arraysIguais(a, b) {
+  if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return false;
+  for (var i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+}
+
+function progressoCompativelComPalavra(progresso, palavraAtual) {
+  if (!progresso || !Array.isArray(progresso.palpites)) return false;
+
+  if (
+    progresso.palavraAlvo &&
+    normalizar(progresso.palavraAlvo) !== normalizar(palavraAtual)
+  ) {
+    return false;
+  }
+
+  for (var i = 0; i < progresso.palpites.length; i++) {
+    var palpite = progresso.palpites[i];
+    if (!palpite || typeof palpite.palavra !== "string") return false;
+
+    var feedbackEsperado = calcularFeedback(palpite.palavra, palavraAtual);
+    if (!arraysIguais(palpite.feedback, feedbackEsperado)) return false;
+  }
+
+  return true;
 }
 
 function obterStatusTeclas() {
@@ -13141,6 +13180,7 @@ function enviarPalpite() {
     guardarProgresso(estado.chaveData, {
       palpites: novosPalpites,
       status: "ganhou",
+      palavraAlvo: estado.palavraAlvo,
     });
   } else if (novosPalpites.length >= 6) {
     estado.fase = "travando";
@@ -13148,6 +13188,7 @@ function enviarPalpite() {
     guardarProgresso(estado.chaveData, {
       palpites: novosPalpites,
       status: "perdeu",
+      palavraAlvo: estado.palavraAlvo,
     });
     setTimeout(function () {
       guardarBloqueio(estado.palavraAlvo, estado.chaveData);
@@ -13160,6 +13201,7 @@ function enviarPalpite() {
     guardarProgresso(estado.chaveData, {
       palpites: novosPalpites,
       status: "jogando",
+      palavraAlvo: estado.palavraAlvo,
     });
   }
 
@@ -13520,6 +13562,11 @@ function iniciar() {
 
   estado.palavraAlvo = palavra;
   estado.chaveData = chave;
+
+  if (progresso && !progressoCompativelComPalavra(progresso, palavra)) {
+    limparProgresso(chave);
+    progresso = null;
+  }
 
   if (progresso) {
     estado.palpites = progresso.palpites || [];
