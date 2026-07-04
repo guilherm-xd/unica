@@ -13402,7 +13402,7 @@ function gerarModalEstatisticas() {
         <h3>📊 Detalhes</h3>
         <div class="stats-grid detalhes">
           <div><span class="numero">${estatisticas.totalTentativas}</span><br>tentativas</div>
-          <div><span class="numero">${mediaTentativas}</span><br>média tentativas</div>
+          <div><span class="numero">${mediaTentativas}</span><br>média de tentativas</div>
           <div><span class="numero">${estatisticas.totalLetrasTentadas}</span><br>letras tentadas</div>
           <div><span class="numero">${estatisticas.totalLetrasCertas}</span><br>✅ certas</div>
           <div><span class="numero">${estatisticas.totalLetrasPresentes}</span><br>🟨 deslocadas</div>
