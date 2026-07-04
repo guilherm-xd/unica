@@ -13313,7 +13313,6 @@ var STATS_KEY = "unica_stats";
 
 var estatisticas = {
   partidas: 0,
-  vitorias: 0,
   sequenciaAtual: 0,
   melhorSequencia: 0,
   distribuicao: [0, 0, 0, 0, 0, 0],
@@ -13382,10 +13381,8 @@ function atualizarEstatisticas(venceu, tentativas, feedbacks) {
 }
 
 function gerarModalEstatisticas() {
-  var total = estatisticas.partidas || 1;
-  var pct = Math.round((estatisticas.vitorias / total) * 100);
-  var mediaTentativas =
-    total > 0 ? (estatisticas.totalTentativas / total).toFixed(1) : "0";
+  var totalLetras = estatisticas.totalLetrasTentadas || 1;
+  var precisao = Math.round(((estatisticas.totalLetrasCertas + estatisticas.totalLetrasPresentes) / totalLetras) * 100);
 
   var html = `
     <div id="modalStats" class="modal-overlay">
@@ -13394,15 +13391,15 @@ function gerarModalEstatisticas() {
         <h2>Estatísticas</h2>
         <div class="stats-grid">
           <div><span class="numero">${estatisticas.partidas}</span><br>jogos</div>
-          <div><span class="numero">${pct}%</span><br>vitórias</div>
+          <div><span class="numero">${precisao}%</span><br>precisão</div>
           <div><span class="numero">${estatisticas.sequenciaAtual}</span><br>sequência atual</div>
           <div><span class="numero">${estatisticas.melhorSequencia}</span><br>melhor sequência</div>
         </div>
 
-        <h3>📊 Detalhes</h3>
+        <h3>Detalhes</h3>
         <div class="stats-grid detalhes">
           <div><span class="numero">${estatisticas.totalTentativas}</span><br>tentativas</div>
-          <div><span class="numero">${mediaTentativas}</span><br>média de tentativas</div>
+          <div><span class="numero">${(estatisticas.partidas > 0 ? (estatisticas.totalTentativas / estatisticas.partidas).toFixed(1) : "0")}</span><br>média de tentativas</div>
           <div><span class="numero">${estatisticas.totalLetrasTentadas}</span><br>letras tentadas</div>
           <div><span class="numero">${estatisticas.totalLetrasCertas}</span><br>✅ certas</div>
           <div><span class="numero">${estatisticas.totalLetrasPresentes}</span><br>🟨 deslocadas</div>
@@ -13457,7 +13454,6 @@ function enviarPalpite() {
     return;
   }
 
-  // 🔥 CORREÇÃO: usar toLowerCase() para bater com as chaves do Yf
   var palavraExibida = Yf[palpiteNorm.toLowerCase()] || palpite;
 
   var feedback = calcularFeedback(palpite, estado.palavraAlvo);
