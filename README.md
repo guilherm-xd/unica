@@ -10,7 +10,7 @@ Feito para quem gosta de desafios diários e quer testar seu vocabulário de for
 
 Esse jogo nasceu da vontade de criar algo simples, bonito e desafiador para o dia a dia. Diferente de outros jogos de palavra, a pressão é mais forte, já que você não pode errar. Cada dia é uma nova palavra, e se você não acertar em 6 tentativas, o jogo se encerra.
 
-A interface foi pensada para ser limpa, com temas visuais que mudam de acordo com o seu gosto (paletas de cores).
+A interface foi pensada para ser limpa, com temas visuais que mudam de acordo com o seu gosto (paletas de cores). Agora também é possível fazer login com o Google para sincronizar seu progresso e estatísticas entre dispositivos, mas isso é opcional - você pode jogar sem login normalmente.
 
 ---
 
@@ -22,7 +22,9 @@ A interface foi pensada para ser limpa, com temas visuais que mudam de acordo co
 - **Feedback visual** - cores para letras corretas (verde), presentes (amarelo) e ausentes (cinza).
 - **Teclado virtual e físico** - suporte a teclado e cliques.
 - **7 paletas de cores** - escolha o tema que mais combina com você.
-- **Progresso salvo** - o jogo lembra seu estado mesmo se você fechar a página.
+- **Progresso salvo localmente** - o jogo lembra seu estado mesmo se você fechar a página.
+- **Sincronização opcional com a nuvem** - com login Google, seus dados são salvos e sincronizados entre navegadores e dispositivos.
+- **Estatísticas detalhadas** - partidas, vitórias, sequências, distribuição de tentativas e contagem de letras.
 - **Bloqueio permanente** - se perder, a palavra do dia fica gravada e o jogo não pode mais ser jogado neste navegador.
 
 ---
@@ -32,7 +34,9 @@ A interface foi pensada para ser limpa, com temas visuais que mudam de acordo co
 - HTML
 - CSS
 - JavaScript
-
+- Banco de dados
+- Integração com APIs
+ 
 ---
 
 ## Como Jogar
@@ -49,12 +53,21 @@ A interface foi pensada para ser limpa, com temas visuais que mudam de acordo co
 
 ---
 
-## Objetivos do Projeto
+## Sincronização com Login
 
-- Criar um jogo diário divertido e desafiador.
-- Praticar desenvolvimento front-end com HTML, CSS e JS.
-- Explorar animações e feedback visual em tempo real.
-- Oferecer uma experiência polida e com identidade visual própria.
+Se quiser, você pode fazer login com sua conta Google clicando no botão "Continuar com Google" (no painel de estatísticas). Com isso, seu progresso e estatísticas serão salvos na nuvem e sincronizados automaticamente entre dispositivos. Se preferir, jogue sem login - os dados ficam salvos apenas localmente.
+
+---
+
+## Estatísticas
+
+O jogo mantém um registro completo da sua performance: total de partidas, taxa de vitórias, sequência atual, melhor sequência, distribuição de tentativas e contagem detalhada de letras certas, presentes e erradas. Tudo acessível pelo ícone 📊 no canto superior direito.
+
+---
+
+## Paletas de Cores
+
+São 7 temas visuais disponíveis, alternados pelo ícone de paleta (🎨) no canto superior direito. Cada um redefine as cores de fundo, texto, bordas e feedback, para você jogar com o estilo que preferir.
 
 ---
 
@@ -76,6 +89,10 @@ Paleta de cores verde
 
 Paleta de cores laranja
 <img width="1913" height="1068" alt="image" src="https://github.com/user-attachments/assets/d0414fb6-61e0-47c2-bf84-a982c5699d51" />
+
+### Painel de estatísticas (exemplo)
+
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/f99782e5-ca52-420e-9134-61b5f0c1bd59" />
 
 ---
 
