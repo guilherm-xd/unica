@@ -4,7 +4,23 @@
 
 Feito para quem gosta de desafios diários e quer testar seu vocabulário de forma rápida e direta.
 
-<video src="https://github.com/user-attachments/assets/6413cf5f-5895-433d-a8cc-cbdafb44a539" autoplay loop muted playsinline></video>
+<p align="center">
+  <img width="800" height="450" alt="unica" src="https://github.com/user-attachments/assets/3e4657cf-ebe1-40f3-b037-3dfe6e3622b3" />
+</p>
+
+<p align="center">
+  <a href="https://guilherm-xd.github.io/unica/">
+    <img src="img/botaojogar.svg" width="150px"/>
+  </a>
+</p>
+
+---
+
+## Projeto Online
+
+Acesse o jogo diretamente pelo navegador:  
+https://guilherm-xd.github.io/unica/
+
 ---
 
 ## Sobre o Projeto
@@ -94,13 +110,6 @@ Paleta de cores laranja
 ### Painel de estatísticas (exemplo)
 
 <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/f99782e5-ca52-420e-9134-61b5f0c1bd59" />
-
----
-
-## Projeto Online
-
-Acesse o jogo diretamente pelo navegador:  
-https://guilherm-xd.github.io/unica/
 
 ---
 
