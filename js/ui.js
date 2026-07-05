@@ -265,7 +265,7 @@ function renderizar() {
         Caso você não consiga adivinhar a palavra, você perderá o jogo e nunca mais conseguirá jogá-lo neste dispositivo.</p>
         <p>Exemplos:</p>
         <div class="exemplo">
-          <span class="letra-exemplo certo">U</span>
+          <span class="letra-exemplo certo">Ú</span>
           <span class="letra-exemplo">N</span>
           <span class="letra-exemplo">I</span>
           <span class="letra-exemplo">C</span>
