@@ -4,7 +4,8 @@
 
 Feito para quem gosta de desafios diários e quer testar seu vocabulário de forma rápida e direta.
 
-<video src="https://github.com/user-attachments/assets/6413cf5f-5895-433d-a8cc-cbdafb44a539" autoplay loop muted playsinline></video>
+<img width="800" height="450" alt="unica" src="https://github.com/user-attachments/assets/3e4657cf-ebe1-40f3-b037-3dfe6e3622b3" />
+
 ---
 
 ## Sobre o Projeto
