@@ -13261,8 +13261,11 @@ function obterStatusTeclas() {
     var letras = p.palavra.split("");
     for (var i = 0; i < letras.length; i++) {
       var ch = letras[i];
+      var chNorm = normalizar(ch);
       var s = p.feedback[i];
-      if (!mapa[ch] || ordem[s] > ordem[mapa[ch]]) mapa[ch] = s;
+      if (!mapa[chNorm] || ordem[s] > ordem[mapa[chNorm]]) {
+        mapa[chNorm] = s;
+      }
     }
   });
 
@@ -13382,7 +13385,11 @@ function atualizarEstatisticas(venceu, tentativas, feedbacks) {
 
 function gerarModalEstatisticas() {
   var totalLetras = estatisticas.totalLetrasTentadas || 1;
-  var precisao = Math.round(((estatisticas.totalLetrasCertas + estatisticas.totalLetrasPresentes) / totalLetras) * 100);
+  var precisao = Math.round(
+    ((estatisticas.totalLetrasCertas + estatisticas.totalLetrasPresentes) /
+      totalLetras) *
+      100,
+  );
 
   var html = `
     <div id="modalStats" class="modal-overlay">
@@ -13399,7 +13406,7 @@ function gerarModalEstatisticas() {
         <h3>Detalhes</h3>
         <div class="stats-grid detalhes">
           <div><span class="numero">${estatisticas.totalTentativas}</span><br>tentativas</div>
-          <div><span class="numero">${(estatisticas.partidas > 0 ? (estatisticas.totalTentativas / estatisticas.partidas).toFixed(1) : "0")}</span><br>média de tentativas</div>
+          <div><span class="numero">${estatisticas.partidas > 0 ? (estatisticas.totalTentativas / estatisticas.partidas).toFixed(1) : "0"}</span><br>média de tentativas</div>
           <div><span class="numero">${estatisticas.totalLetrasTentadas}</span><br>letras tentadas</div>
           <div><span class="numero">${estatisticas.totalLetrasCertas}</span><br>✅ certas</div>
           <div><span class="numero">${estatisticas.totalLetrasPresentes}</span><br>🟨 deslocadas</div>
