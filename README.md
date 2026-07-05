@@ -16,13 +16,6 @@ Feito para quem gosta de desafios diários e quer testar seu vocabulário de for
 
 ---
 
-## Projeto Online
-
-Acesse o jogo diretamente pelo navegador:  
-https://guilherm-xd.github.io/unica/
-
----
-
 ## Sobre o Projeto
 
 Esse jogo nasceu da vontade de criar algo simples, bonito e desafiador para o dia a dia. Diferente de outros jogos de palavra, a pressão é mais forte, já que você não pode errar. Cada dia é uma nova palavra, e se você não acertar em 6 tentativas, o jogo se encerra.
@@ -110,6 +103,13 @@ Paleta de cores laranja
 ### Painel de estatísticas (exemplo)
 
 <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/f99782e5-ca52-420e-9134-61b5f0c1bd59" />
+
+---
+
+## Projeto Online
+
+Acesse o jogo diretamente pelo navegador:  
+https://guilherm-xd.github.io/unica/
 
 ---
 
