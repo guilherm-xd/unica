@@ -33,10 +33,7 @@ async function carregarDadosDoFirestore(uid) {
           aplicarPaleta(modo, cor);
         }
       } else if (dados.estadoJogo) {
-        if (
-          PALETAS_MODOS[estado.modoPaleta] &&
-          PALETAS_CORES[estado.corPaleta]
-        ) {
+        if (PALETAS_MODOS[estado.modoPaleta] && PALETAS_CORES[estado.corPaleta]) {
           aplicarPaleta(estado.modoPaleta, estado.corPaleta);
         } else if (typeof estado.paleta === "number") {
           var pref = preferenciaPorIndiceLegado(estado.paleta);
@@ -49,7 +46,9 @@ async function carregarDadosDoFirestore(uid) {
         var dataAtual = estado.chaveData;
 
         if (cloudState.fase === "bloqueado" && cloudState.palavraBloqueada) {
-          Object.assign(estado, cloudState);
+          estado.fase = "bloqueado";
+          estado.palavraBloqueada = cloudState.palavraBloqueada;
+          estado.dataBloqueio = cloudState.dataBloqueio;
           estado._atualizadoEm = cloudState._atualizadoEm || Date.now();
           dadosCarregadosDoCloud = true;
           renderizar();
@@ -58,13 +57,18 @@ async function carregarDadosDoFirestore(uid) {
         }
 
         if (cloudState.chaveData === dataAtual) {
-          Object.assign(estado, cloudState);
+          estado.palpites = cloudState.palpites || [];
+          estado.fase = cloudState.fase || "jogando";
+          estado.letrasAtuais = cloudState.letrasAtuais || ["", "", "", "", ""];
+          estado.posicaoCursor = cloudState.posicaoCursor || 0;
+          estado.acabouDeEnviar = cloudState.acabouDeEnviar || false;
           estado._atualizadoEm = cloudState._atualizadoEm || Date.now();
         } else {
           estado.palpites = [];
           estado.fase = "jogando";
           estado.letrasAtuais = ["", "", "", "", ""];
           estado.posicaoCursor = 0;
+          estado.acabouDeEnviar = false;
           removerStorage("blocked");
           await salvarDadosNoFirestore(uid);
         }
