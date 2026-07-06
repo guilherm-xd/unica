@@ -391,6 +391,7 @@ document.addEventListener("click", function (e) {
   var quadrado = e.target.closest(".quadrado[data-row]");
   if (quadrado && estado.fase === "jogando") {
     estado.posicaoCursor = parseInt(quadrado.dataset.col, 10);
+    persistirEstadoLocalAtual();
     renderizar();
     return;
   }
@@ -409,6 +410,7 @@ window.addEventListener("keydown", function (e) {
 
   if (e.key === "Backspace") {
     lidarComBackspace();
+    persistirEstadoLocalAtual();
     renderizar();
     return;
   }
@@ -416,6 +418,7 @@ window.addEventListener("keydown", function (e) {
   if (e.key === "ArrowLeft") {
     e.preventDefault();
     estado.posicaoCursor = Math.max(0, estado.posicaoCursor - 1);
+    persistirEstadoLocalAtual();
     renderizar();
     return;
   }
@@ -423,6 +426,7 @@ window.addEventListener("keydown", function (e) {
   if (e.key === "ArrowRight") {
     e.preventDefault();
     estado.posicaoCursor = Math.min(4, estado.posicaoCursor + 1);
+    persistirEstadoLocalAtual();
     renderizar();
     return;
   }

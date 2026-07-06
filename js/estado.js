@@ -76,10 +76,68 @@ function limparProgresso(chave) {
   removerStorage("progress_" + chave);
 }
 
+function statusProgressoAtual() {
+  if (estado.fase === "ganhou") return "ganhou";
+  if (estado.fase === "travando" || estado.fase === "bloqueado") return "perdeu";
+  return "jogando";
+}
+
+function snapshotProgressoAtual() {
+  return {
+    palpites: estado.palpites.slice(),
+    status: statusProgressoAtual(),
+    palavraAlvo: estado.palavraAlvo,
+    letrasAtuais: estado.letrasAtuais.slice(),
+    posicaoCursor: estado.posicaoCursor,
+    palavraBloqueada: estado.palavraBloqueada,
+    dataBloqueio: estado.dataBloqueio,
+  };
+}
+
+function aplicarProgressoAoEstado(progresso) {
+  var status = progresso.status || progresso.fase || "jogando";
+  estado.palpites = Array.isArray(progresso.palpites) ? progresso.palpites : [];
+  estado.letrasAtuais =
+    Array.isArray(progresso.letrasAtuais) && progresso.letrasAtuais.length === 5
+      ? progresso.letrasAtuais.slice()
+      : ["", "", "", "", ""];
+  estado.posicaoCursor =
+    typeof progresso.posicaoCursor === "number" ? progresso.posicaoCursor : 0;
+  estado.palavraBloqueada = progresso.palavraBloqueada || "";
+  estado.dataBloqueio = progresso.dataBloqueio || "";
+
+  if (progresso.palavraAlvo) {
+    estado.palavraAlvo = progresso.palavraAlvo;
+  }
+
+  if (status === "ganhou") {
+    estado.fase = "ganhou";
+  } else if (status === "perdeu" || status === "travando") {
+    estado.fase = estado.palavraBloqueada ? "bloqueado" : "travando";
+  } else if (status === "bloqueado") {
+    estado.fase = "bloqueado";
+  } else {
+    estado.fase = "jogando";
+  }
+}
+
+function persistirEstadoLocalAtual() {
+  if (!estado.chaveData) return;
+
+  guardarProgresso(estado.chaveData, snapshotProgressoAtual());
+
+  if (estado.fase === "bloqueado" && estado.palavraBloqueada) {
+    guardarBloqueio(estado.palavraBloqueada, estado.dataBloqueio || estado.chaveData);
+  } else {
+    removerStorage("blocked");
+  }
+}
+
 var STATS_KEY = "unica_stats";
 
 var estatisticas = {
   partidas: 0,
+  vitorias: 0,
   sequenciaAtual: 0,
   melhorSequencia: 0,
   distribuicao: [0, 0, 0, 0, 0, 0],
@@ -299,11 +357,7 @@ function enviarPalpite() {
   if (venceu) {
     estado.fase = "ganhou";
     mostrarMensagem("encontrada.", false);
-    guardarProgresso(estado.chaveData, {
-      palpites: novosPalpites,
-      status: "ganhou",
-      palavraAlvo: estado.palavraAlvo,
-    });
+    persistirEstadoLocalAtual();
     atualizarEstatisticas(
       true,
       novosPalpites.length,
@@ -315,11 +369,7 @@ function enviarPalpite() {
   } else if (novosPalpites.length >= 6) {
     estado.fase = "travando";
     mostrarMensagem("essa era a sua única tentativa.", true);
-    guardarProgresso(estado.chaveData, {
-      palpites: novosPalpites,
-      status: "perdeu",
-      palavraAlvo: estado.palavraAlvo,
-    });
+    persistirEstadoLocalAtual();
     atualizarEstatisticas(
       false,
       novosPalpites.length,
@@ -329,18 +379,17 @@ function enviarPalpite() {
     );
     setTimeout(mostrarModalEstatisticas, 800);
     setTimeout(function () {
-      guardarBloqueio(estado.palavraAlvo, estado.chaveData);
       estado.palavraBloqueada = estado.palavraAlvo;
       estado.dataBloqueio = estado.chaveData;
       estado.fase = "bloqueado";
+      persistirEstadoLocalAtual();
+      if (usuarioAtual) {
+        salvarDadosNoFirestore(usuarioAtual.uid);
+      }
       renderizar();
     }, 1700);
   } else {
-    guardarProgresso(estado.chaveData, {
-      palpites: novosPalpites,
-      status: "jogando",
-      palavraAlvo: estado.palavraAlvo,
-    });
+    persistirEstadoLocalAtual();
   }
 
   renderizar();
@@ -355,9 +404,11 @@ function pressionarTecla(k) {
   if (k === "ENTER") return enviarPalpite();
   if (k === "BACK") {
     lidarComBackspace();
+    persistirEstadoLocalAtual();
     renderizar();
     return;
   }
   lidarComLetra(k);
+  persistirEstadoLocalAtual();
   renderizar();
 }

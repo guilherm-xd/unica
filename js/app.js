@@ -1,18 +1,4 @@
-function iniciar() {
-  carregarEstatisticas();
-
-  var preferencia = carregarPreferenciaPaleta();
-  aplicarPaleta(preferencia.modo, preferencia.cor);
-
-  var bloqueado = carregarBloqueio();
-  if (bloqueado) {
-    estado.palavraBloqueada = bloqueado.blockedWord || "?????";
-    estado.dataBloqueio = bloqueado.blockedDate || "";
-    estado.fase = "bloqueado";
-    renderizar();
-    return;
-  }
-
+function obterDadosDoDiaAtual() {
   var agora = new Date();
   var y = agora.getFullYear();
   var m = agora.getMonth();
@@ -28,21 +14,57 @@ function iniciar() {
   var chave =
     y + "-" + String(m + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0");
 
-  var progresso = carregarProgresso(chave);
+  return { palavra: palavra, chave: chave };
+}
 
-  estado.palavraAlvo = palavra;
-  estado.chaveData = chave;
+function prepararEstadoDoDia() {
+  var dadosDoDia = obterDadosDoDiaAtual();
+  estado.palavraAlvo = dadosDoDia.palavra;
+  estado.chaveData = dadosDoDia.chave;
+  return dadosDoDia;
+}
 
-  if (progresso && !progressoCompativelComPalavra(progresso, palavra)) {
-    limparProgresso(chave);
+function iniciar() {
+  carregarEstatisticas();
+
+  var preferencia = carregarPreferenciaPaleta();
+  aplicarPaleta(preferencia.modo, preferencia.cor);
+
+  var dadosDoDia = prepararEstadoDoDia();
+
+  var bloqueado = carregarBloqueio();
+  if (bloqueado) {
+    estado.palavraBloqueada = bloqueado.blockedWord || "?????";
+    estado.dataBloqueio = bloqueado.blockedDate || "";
+    estado.fase = "bloqueado";
+    renderizar();
+    return;
+  }
+
+  var jaVeioDaNuvem =
+    dadosCarregadosDoCloud && estado.chaveData === dadosDoDia.chave;
+
+  if (jaVeioDaNuvem) {
+    renderizar();
+    return;
+  }
+
+  var progresso = carregarProgresso(dadosDoDia.chave);
+
+  if (progresso && !progressoCompativelComPalavra(progresso, dadosDoDia.palavra)) {
+    limparProgresso(dadosDoDia.chave);
     progresso = null;
   }
 
   if (progresso) {
-    estado.palpites = progresso.palpites || [];
-    estado.fase = progresso.status === "ganhou" ? "ganhou" : "jogando";
+    aplicarProgressoAoEstado(progresso);
   } else {
+    estado.palpites = [];
     estado.fase = "jogando";
+    estado.letrasAtuais = ["", "", "", "", ""];
+    estado.posicaoCursor = 0;
+    estado.palavraBloqueada = "";
+    estado.dataBloqueio = "";
   }
 
   renderizar();

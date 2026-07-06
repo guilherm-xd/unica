@@ -14,8 +14,31 @@ var db = firebase.firestore();
 var usuarioAtual = null;
 var dadosCarregadosDoCloud = false;
 
+function garantirEstadoDoDiaAtual() {
+  if (estado.chaveData && estado.palavraAlvo) return;
+
+  if (typeof prepararEstadoDoDia === "function") {
+    prepararEstadoDoDia();
+    return;
+  }
+
+  var agora = new Date();
+  var y = agora.getFullYear();
+  var m = agora.getMonth();
+  var d = agora.getDate();
+  var hoje = Math.floor(Date.UTC(y, m, d) / 86400000);
+  var dn = hoje - EPOCA + 1;
+  var idx = (((dn - 1) % Pf.length) + Pf.length) % Pf.length;
+
+  estado.palavraAlvo = Pf[idx];
+  estado.chaveData =
+    y + "-" + String(m + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0");
+}
+
 async function carregarDadosDoFirestore(uid) {
   try {
+    garantirEstadoDoDiaAtual();
+
     var docRef = db.collection("usuarios").doc(uid);
     var doc = await docRef.get();
 
@@ -24,6 +47,7 @@ async function carregarDadosDoFirestore(uid) {
 
       if (dados.estatisticas) {
         Object.assign(estatisticas, dados.estatisticas);
+        salvarEstatisticas();
       }
 
       if (dados.preferencias) {
@@ -46,10 +70,16 @@ async function carregarDadosDoFirestore(uid) {
         var dataAtual = estado.chaveData;
 
         if (cloudState.fase === "bloqueado" && cloudState.palavraBloqueada) {
+          estado.palavraAlvo = cloudState.palavraAlvo || estado.palavraAlvo;
           estado.fase = "bloqueado";
           estado.palavraBloqueada = cloudState.palavraBloqueada;
           estado.dataBloqueio = cloudState.dataBloqueio;
+          estado.palpites = cloudState.palpites || [];
+          estado.letrasAtuais = ["", "", "", "", ""];
+          estado.posicaoCursor = 0;
+          estado.acabouDeEnviar = false;
           estado._atualizadoEm = cloudState._atualizadoEm || Date.now();
+          persistirEstadoLocalAtual();
           dadosCarregadosDoCloud = true;
           renderizar();
           atualizarInterfaceUsuario();
@@ -57,19 +87,20 @@ async function carregarDadosDoFirestore(uid) {
         }
 
         if (cloudState.chaveData === dataAtual) {
-          estado.palpites = cloudState.palpites || [];
-          estado.fase = cloudState.fase || "jogando";
-          estado.letrasAtuais = cloudState.letrasAtuais || ["", "", "", "", ""];
-          estado.posicaoCursor = cloudState.posicaoCursor || 0;
+          aplicarProgressoAoEstado(cloudState);
+          estado.palavraAlvo = cloudState.palavraAlvo || estado.palavraAlvo;
           estado.acabouDeEnviar = cloudState.acabouDeEnviar || false;
           estado._atualizadoEm = cloudState._atualizadoEm || Date.now();
+          persistirEstadoLocalAtual();
         } else {
           estado.palpites = [];
           estado.fase = "jogando";
           estado.letrasAtuais = ["", "", "", "", ""];
           estado.posicaoCursor = 0;
+          estado.palavraBloqueada = "";
+          estado.dataBloqueio = "";
           estado.acabouDeEnviar = false;
-          removerStorage("blocked");
+          persistirEstadoLocalAtual();
           await salvarDadosNoFirestore(uid);
         }
       }
@@ -155,8 +186,14 @@ async function logout() {
     if (chave) {
       var progresso = carregarProgresso(chave);
       if (progresso) {
-        estado.palpites = progresso.palpites || [];
-        estado.fase = progresso.status === "ganhou" ? "ganhou" : "jogando";
+        aplicarProgressoAoEstado(progresso);
+      } else {
+        estado.palpites = [];
+        estado.letrasAtuais = ["", "", "", "", ""];
+        estado.posicaoCursor = 0;
+        estado.palavraBloqueada = "";
+        estado.dataBloqueio = "";
+        estado.fase = "jogando";
       }
     }
 
