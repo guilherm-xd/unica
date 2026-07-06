@@ -31,7 +31,7 @@ A interface foi pensada para ser limpa, com temas visuais que mudam de acordo co
 - **6 tentativas** - você tem 6 tentativas para acertar, mas se não acertar, o bloqueio ocorre.
 - **Feedback visual** - cores para letras corretas (verde), presentes (amarelo) e ausentes (cinza).
 - **Teclado virtual e físico** - suporte a teclado e cliques.
-- **7 paletas de cores** - escolha o tema que mais combina com você.
+- **12 paletas de cores** - escolha entre diversos temas, com combinações de modos **Claro** e **Escuro**.
 - **Progresso salvo localmente** - o jogo lembra seu estado mesmo se você fechar a página.
 - **Sincronização opcional com a nuvem** - com login Google, seus dados são salvos e sincronizados entre navegadores e dispositivos.
 - **Estatísticas detalhadas** - partidas, vitórias, sequências, distribuição de tentativas e contagem de letras.
@@ -46,7 +46,7 @@ A interface foi pensada para ser limpa, com temas visuais que mudam de acordo co
 - JavaScript
 - Banco de dados
 - Integração com APIs
- 
+
 ---
 
 ## Como Jogar
@@ -59,7 +59,7 @@ A interface foi pensada para ser limpa, com temas visuais que mudam de acordo co
    - 🟨 **Amarelo** = letra correta, mas na posição errada.
    - ⬜ **Cinza** = letra não está na palavra.
 5. Você tem até **6 tentativas**.
-6. Se acertar, parabéns! Se não, o jogo se bloqueia **PARA SEMPRE** neste dispositivo. 
+6. Se acertar, parabéns! Se não, o jogo se bloqueia **PARA SEMPRE** neste dispositivo.
 
 ---
 
@@ -77,7 +77,7 @@ O jogo mantém um registro completo da sua performance: total de partidas, taxa 
 
 ## Paletas de Cores
 
-São 7 temas visuais disponíveis, alternados pelo ícone de paleta (🎨) no canto superior direito. Cada um redefine as cores de fundo, texto, bordas e feedback, para você jogar com o estilo que preferir.
+São **12 temas visuais** disponíveis, alternados pelo ícone de paleta (🎨) no canto superior direito. Cada um redefine as cores de fundo, texto, bordas e feedback, para você jogar com o estilo que preferir. O sistema agora também conta com modos **Claro** e **Escuro**, que podem ser combinados com qualquer uma das cores disponíveis.
 
 ---
 
