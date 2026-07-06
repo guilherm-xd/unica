@@ -33,7 +33,10 @@ async function carregarDadosDoFirestore(uid) {
           aplicarPaleta(modo, cor);
         }
       } else if (dados.estadoJogo) {
-        if (PALETAS_MODOS[estado.modoPaleta] && PALETAS_CORES[estado.corPaleta]) {
+        if (
+          PALETAS_MODOS[estado.modoPaleta] &&
+          PALETAS_CORES[estado.corPaleta]
+        ) {
           aplicarPaleta(estado.modoPaleta, estado.corPaleta);
         } else if (typeof estado.paleta === "number") {
           var pref = preferenciaPorIndiceLegado(estado.paleta);
@@ -44,20 +47,25 @@ async function carregarDadosDoFirestore(uid) {
       if (dados.estadoJogo) {
         var cloudState = dados.estadoJogo;
         var dataAtual = estado.chaveData;
+
+        if (cloudState.fase === "bloqueado" && cloudState.palavraBloqueada) {
+          Object.assign(estado, cloudState);
+          estado._atualizadoEm = cloudState._atualizadoEm || Date.now();
+          dadosCarregadosDoCloud = true;
+          renderizar();
+          atualizarInterfaceUsuario();
+          return;
+        }
+
         if (cloudState.chaveData === dataAtual) {
-          var cloudTime = cloudState._atualizadoEm || 0;
-          var localTime = estado._atualizadoEm || 0;
-          if (cloudTime > localTime) {
-            Object.assign(estado, cloudState);
-            estado._atualizadoEm = cloudTime;
-          } else {
-            await salvarDadosNoFirestore(uid);
-          }
+          Object.assign(estado, cloudState);
+          estado._atualizadoEm = cloudState._atualizadoEm || Date.now();
         } else {
           estado.palpites = [];
           estado.fase = "jogando";
           estado.letrasAtuais = ["", "", "", "", ""];
           estado.posicaoCursor = 0;
+          removerStorage("blocked");
           await salvarDadosNoFirestore(uid);
         }
       }
