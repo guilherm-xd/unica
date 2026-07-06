@@ -76,10 +76,39 @@ function limparProgresso(chave) {
   removerStorage("progress_" + chave);
 }
 
-function statusProgressoAtual() {
-  if (estado.fase === "ganhou") return "ganhou";
-  if (estado.fase === "travando" || estado.fase === "bloqueado") return "perdeu";
+function determinarStatusProgresso(progresso) {
+  var statusExplicito = progresso.status || progresso.fase;
+  if (
+    statusExplicito === "ganhou" ||
+    statusExplicito === "bloqueado" ||
+    statusExplicito === "travando" ||
+    statusExplicito === "perdeu"
+  ) {
+    return statusExplicito;
+  }
+
+  var palavraAlvo = progresso.palavraAlvo || estado.palavraAlvo;
+  var palpites = Array.isArray(progresso.palpites) ? progresso.palpites : [];
+  if (!palavraAlvo || palpites.length === 0) return "jogando";
+
+  var ultimoPalpite = palpites[palpites.length - 1];
+  if (
+    ultimoPalpite &&
+    typeof ultimoPalpite.palavra === "string" &&
+    normalizar(ultimoPalpite.palavra) === normalizar(palavraAlvo)
+  ) {
+    return "ganhou";
+  }
+
+  if (palpites.length >= 6) {
+    return progresso.palavraBloqueada ? "bloqueado" : "perdeu";
+  }
+
   return "jogando";
+}
+
+function statusProgressoAtual() {
+  return determinarStatusProgresso(estado);
 }
 
 function snapshotProgressoAtual() {
@@ -95,7 +124,7 @@ function snapshotProgressoAtual() {
 }
 
 function aplicarProgressoAoEstado(progresso) {
-  var status = progresso.status || progresso.fase || "jogando";
+  var status = determinarStatusProgresso(progresso);
   estado.palpites = Array.isArray(progresso.palpites) ? progresso.palpites : [];
   estado.letrasAtuais =
     Array.isArray(progresso.letrasAtuais) && progresso.letrasAtuais.length === 5

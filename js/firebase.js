@@ -14,6 +14,16 @@ var db = firebase.firestore();
 var usuarioAtual = null;
 var dadosCarregadosDoCloud = false;
 var sincronizandoDadosDaConta = false;
+var filaSalvamentoFirestore = Promise.resolve();
+
+function clonarPalpitesParaSync() {
+  return estado.palpites.map(function (palpite) {
+    return {
+      palavra: palpite.palavra,
+      feedback: Array.isArray(palpite.feedback) ? palpite.feedback.slice() : [],
+    };
+  });
+}
 
 function garantirEstadoDoDiaAtual() {
   if (estado.chaveData && estado.palavraAlvo) return;
@@ -59,10 +69,7 @@ async function carregarDadosDoFirestore(uid) {
           aplicarPaleta(modo, cor, { naoSincronizar: true });
         }
       } else if (dados.estadoJogo) {
-        if (
-          PALETAS_MODOS[estado.modoPaleta] &&
-          PALETAS_CORES[estado.corPaleta]
-        ) {
+        if (PALETAS_MODOS[estado.modoPaleta] && PALETAS_CORES[estado.corPaleta]) {
           aplicarPaleta(estado.modoPaleta, estado.corPaleta, {
             naoSincronizar: true,
           });
@@ -130,41 +137,58 @@ async function carregarDadosDoFirestore(uid) {
 
 async function salvarDadosNoFirestore(uid) {
   if (!uid || sincronizandoDadosDaConta) return;
-  try {
-    estado._atualizadoEm = Date.now();
+  estado._atualizadoEm = Date.now();
 
-    var dados = {
-      estatisticas: estatisticas,
-      estadoJogo: {
-        chaveData: estado.chaveData,
-        palavraAlvo: estado.palavraAlvo,
-        palpites: estado.palpites.slice(),
-        letrasAtuais: estado.letrasAtuais.slice(),
-        posicaoCursor: estado.posicaoCursor,
-        fase: estado.fase,
-        status:
-          typeof statusProgressoAtual === "function"
-            ? statusProgressoAtual()
-            : estado.fase,
-        palavraBloqueada: estado.palavraBloqueada,
-        dataBloqueio: estado.dataBloqueio,
-        paleta: estado.paleta,
-        modoPaleta: estado.modoPaleta,
-        corPaleta: estado.corPaleta,
-        _atualizadoEm: estado._atualizadoEm,
-      },
-      preferencias: {
-        modoPaleta: estado.modoPaleta,
-        corPaleta: estado.corPaleta,
-      },
-      ultimaAtualizacao: firebase.firestore.FieldValue.serverTimestamp(),
-    };
+  var dados = {
+    estatisticas: {
+      partidas: estatisticas.partidas,
+      vitorias: estatisticas.vitorias,
+      sequenciaAtual: estatisticas.sequenciaAtual,
+      melhorSequencia: estatisticas.melhorSequencia,
+      distribuicao: estatisticas.distribuicao.slice(),
+      totalTentativas: estatisticas.totalTentativas,
+      totalLetrasTentadas: estatisticas.totalLetrasTentadas,
+      totalLetrasCertas: estatisticas.totalLetrasCertas,
+      totalLetrasPresentes: estatisticas.totalLetrasPresentes,
+      totalLetrasErradas: estatisticas.totalLetrasErradas,
+    },
+    estadoJogo: {
+      chaveData: estado.chaveData,
+      palavraAlvo: estado.palavraAlvo,
+      palpites: clonarPalpitesParaSync(),
+      letrasAtuais: estado.letrasAtuais.slice(),
+      posicaoCursor: estado.posicaoCursor,
+      fase: estado.fase,
+      status:
+        typeof statusProgressoAtual === "function"
+          ? statusProgressoAtual()
+          : estado.fase,
+      palavraBloqueada: estado.palavraBloqueada,
+      dataBloqueio: estado.dataBloqueio,
+      paleta: estado.paleta,
+      modoPaleta: estado.modoPaleta,
+      corPaleta: estado.corPaleta,
+      _atualizadoEm: estado._atualizadoEm,
+    },
+    preferencias: {
+      modoPaleta: estado.modoPaleta,
+      corPaleta: estado.corPaleta,
+    },
+    ultimaAtualizacao: firebase.firestore.FieldValue.serverTimestamp(),
+  };
 
-    await db.collection("usuarios").doc(uid).set(dados, { merge: true });
-    console.log("💾 Dados salvos no Firestore");
-  } catch (error) {
-    console.error("❌ Erro ao salvar dados:", error);
-  }
+  filaSalvamentoFirestore = filaSalvamentoFirestore
+    .catch(function () {})
+    .then(async function () {
+      try {
+        await db.collection("usuarios").doc(uid).set(dados, { merge: true });
+        console.log("💾 Dados salvos no Firestore");
+      } catch (error) {
+        console.error("❌ Erro ao salvar dados:", error);
+      }
+    });
+
+  return filaSalvamentoFirestore;
 }
 
 async function loginGoogle() {
