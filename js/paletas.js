@@ -328,7 +328,8 @@ function aplicarFundoPaleta(modo, cor) {
   });
 }
 
-function aplicarPaleta(modo, cor) {
+function aplicarPaleta(modo, cor, opcoes) {
+  opcoes = opcoes || {};
   if (!PALETAS_MODOS[modo]) modo = MODO_PALETA_PADRAO;
   if (!PALETAS_CORES[cor]) cor = COR_PALETA_PADRAO;
   aplicarVars(PALETAS_MODOS[modo]);
@@ -340,7 +341,11 @@ function aplicarPaleta(modo, cor) {
   guardarStorage("palette_mode", modo);
   guardarStorage("palette_color", cor);
   guardarStorage("palette", String(estado.paleta));
-  if (typeof usuarioAtual !== "undefined" && usuarioAtual) {
+  if (
+    !opcoes.naoSincronizar &&
+    typeof usuarioAtual !== "undefined" &&
+    usuarioAtual
+  ) {
     salvarDadosNoFirestore(usuarioAtual.uid);
   }
 }

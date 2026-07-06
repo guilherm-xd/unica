@@ -13,6 +13,7 @@ var db = firebase.firestore();
 
 var usuarioAtual = null;
 var dadosCarregadosDoCloud = false;
+var sincronizandoDadosDaConta = false;
 
 function garantirEstadoDoDiaAtual() {
   if (estado.chaveData && estado.palavraAlvo) return;
@@ -36,6 +37,7 @@ function garantirEstadoDoDiaAtual() {
 }
 
 async function carregarDadosDoFirestore(uid) {
+  sincronizandoDadosDaConta = true;
   try {
     garantirEstadoDoDiaAtual();
 
@@ -54,14 +56,19 @@ async function carregarDadosDoFirestore(uid) {
         var modo = dados.preferencias.modoPaleta;
         var cor = dados.preferencias.corPaleta;
         if (PALETAS_MODOS[modo] && PALETAS_CORES[cor]) {
-          aplicarPaleta(modo, cor);
+          aplicarPaleta(modo, cor, { naoSincronizar: true });
         }
       } else if (dados.estadoJogo) {
-        if (PALETAS_MODOS[estado.modoPaleta] && PALETAS_CORES[estado.corPaleta]) {
-          aplicarPaleta(estado.modoPaleta, estado.corPaleta);
+        if (
+          PALETAS_MODOS[estado.modoPaleta] &&
+          PALETAS_CORES[estado.corPaleta]
+        ) {
+          aplicarPaleta(estado.modoPaleta, estado.corPaleta, {
+            naoSincronizar: true,
+          });
         } else if (typeof estado.paleta === "number") {
           var pref = preferenciaPorIndiceLegado(estado.paleta);
-          aplicarPaleta(pref.modo, pref.cor);
+          aplicarPaleta(pref.modo, pref.cor, { naoSincronizar: true });
         }
       }
 
@@ -116,17 +123,36 @@ async function carregarDadosDoFirestore(uid) {
     atualizarInterfaceUsuario();
   } catch (error) {
     console.error("❌ Erro ao carregar dados:", error);
+  } finally {
+    sincronizandoDadosDaConta = false;
   }
 }
 
 async function salvarDadosNoFirestore(uid) {
-  if (!uid) return;
+  if (!uid || sincronizandoDadosDaConta) return;
   try {
     estado._atualizadoEm = Date.now();
 
     var dados = {
       estatisticas: estatisticas,
-      estadoJogo: { ...estado },
+      estadoJogo: {
+        chaveData: estado.chaveData,
+        palavraAlvo: estado.palavraAlvo,
+        palpites: estado.palpites.slice(),
+        letrasAtuais: estado.letrasAtuais.slice(),
+        posicaoCursor: estado.posicaoCursor,
+        fase: estado.fase,
+        status:
+          typeof statusProgressoAtual === "function"
+            ? statusProgressoAtual()
+            : estado.fase,
+        palavraBloqueada: estado.palavraBloqueada,
+        dataBloqueio: estado.dataBloqueio,
+        paleta: estado.paleta,
+        modoPaleta: estado.modoPaleta,
+        corPaleta: estado.corPaleta,
+        _atualizadoEm: estado._atualizadoEm,
+      },
       preferencias: {
         modoPaleta: estado.modoPaleta,
         corPaleta: estado.corPaleta,
