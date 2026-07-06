@@ -5,7 +5,7 @@
 Feito para quem gosta de desafios diários e quer testar seu vocabulário de forma rápida e direta.
 
 <p align="center">
-  <img width="800" height="450" alt="unica" src="https://github.com/user-attachments/assets/3e4657cf-ebe1-40f3-b037-3dfe6e3622b3" />
+  <img width="800" height="450" alt="unica" src="https://github.com/user-attachments/assets/3e4657cf-ebe1-40f3-b037-3dfe6e3622b3"/>
 </p>
 
 <p align="center">
