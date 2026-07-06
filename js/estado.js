@@ -11,6 +11,8 @@ var estado = {
   palavraBloqueada: "",
   dataBloqueio: "",
   paleta: 0,
+  modoPaleta: "escuro",
+  corPaleta: "azul",
   letrasAnteriores: ["", "", "", "", ""],
   acabouDeEnviar: false,
 };

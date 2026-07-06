@@ -120,11 +120,46 @@ function htmlPontos() {
 }
 
 function htmlBotaoPaleta() {
-  var nome = PALETAS[estado.paleta].nome;
+  var modoAtual = estado.modoPaleta;
+  var corAtual = estado.corPaleta;
+  var nome =
+    PALETAS_MODOS[modoAtual].nome + " / " + PALETAS_CORES[corAtual].nome;
+  var modos = "";
+  for (var modo in PALETAS_MODOS) {
+    modos +=
+      '<button type="button" class="opcao-modo ' +
+      (modo === modoAtual ? "ativo" : "") +
+      '" data-modo-paleta="' +
+      modo +
+      '">' +
+      PALETAS_MODOS[modo].nome +
+      "</button>";
+  }
+  var cores = "";
+  for (var i = 0; i < ORDEM_CORES_PALETA.length; i++) {
+    var cor = ORDEM_CORES_PALETA[i];
+    cores +=
+      '<button type="button" class="opcao-paleta ' +
+      (cor === corAtual ? "ativo" : "") +
+      '" data-cor-paleta="' +
+      cor +
+      '" title="' +
+      PALETAS_CORES[cor].nome +
+      '"><span style="background:' +
+      PALETAS_CORES[cor]["--accent"] +
+      '"></span></button>';
+  }
   return (
-    '<button class="btn-paleta" id="btnPaleta" title="Paleta: ' +
+    '<div class="seletor-paleta" id="seletorPaleta">' +
+    '<button type="button" class="btn-paleta" id="btnPaleta" title="Paleta: ' +
     nome +
-    ' — clique para mudar">🎨 <span class="amostra-cor"></span></button>'
+    '">🎨 <span class="amostra-cor"></span></button>' +
+    '<div class="ponte-paleta"></div>' +
+    '<div class="menu-paleta"><div class="grupo-modo">' +
+    modos +
+    '</div><div class="grupo-cores">' +
+    cores +
+    "</div></div></div>"
   );
 }
 
@@ -198,6 +233,20 @@ function mostrarModalEstatisticas() {
   });
 
   atualizarInterfaceUsuario();
+}
+
+function configurarSeletorPaleta() {
+  var seletor = document.getElementById("seletorPaleta");
+  var botao = document.getElementById("btnPaleta");
+  if (!seletor || !botao) return;
+
+  botao.addEventListener("mouseenter", function () {
+    seletor.classList.add("aberto");
+  });
+
+  seletor.addEventListener("mouseleave", function () {
+    seletor.classList.remove("aberto");
+  });
 }
 
 function renderizar() {
@@ -302,6 +351,8 @@ function renderizar() {
   estado.letrasAnteriores = estado.letrasAtuais.slice();
   estado.acabouDeEnviar = false;
 
+  configurarSeletorPaleta();
+
   document.getElementById("btnStats").addEventListener("click", function (e) {
     e.stopPropagation();
     mostrarModalEstatisticas();
@@ -309,11 +360,23 @@ function renderizar() {
 }
 
 document.addEventListener("click", function (e) {
-  if (e.target.closest("#btnPaleta")) {
-    estado.paleta = (estado.paleta + 1) % PALETAS.length;
-    aplicarPaleta(estado.paleta);
+  var modoPaleta = e.target.closest("[data-modo-paleta]");
+  if (modoPaleta) {
+    aplicarPaleta(modoPaleta.dataset.modoPaleta, estado.corPaleta);
     renderizar();
     return;
+  }
+
+  var corPaleta = e.target.closest("[data-cor-paleta]");
+  if (corPaleta) {
+    aplicarPaleta(estado.modoPaleta, corPaleta.dataset.corPaleta);
+    renderizar();
+    return;
+  }
+
+  var seletorAberto = document.getElementById("seletorPaleta");
+  if (seletorAberto && !e.target.closest("#seletorPaleta")) {
+    seletorAberto.classList.remove("aberto");
   }
 
   if (

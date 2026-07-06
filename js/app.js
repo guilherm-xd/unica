@@ -1,14 +1,8 @@
 function iniciar() {
   carregarEstatisticas();
 
-  var paletaSalva = parseInt(
-    pegarStorage("palette") || String(PALETA_PADRAO),
-    10,
-  );
-  estado.paleta = isNaN(paletaSalva)
-    ? PALETA_PADRAO
-    : Math.min(Math.max(paletaSalva, 0), PALETAS.length - 1);
-  aplicarPaleta(estado.paleta);
+  var preferencia = carregarPreferenciaPaleta();
+  aplicarPaleta(preferencia.modo, preferencia.cor);
 
   var bloqueado = carregarBloqueio();
   if (bloqueado) {

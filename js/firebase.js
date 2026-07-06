@@ -26,13 +26,38 @@ async function carregarDadosDoFirestore(uid) {
         Object.assign(estatisticas, dados.estatisticas);
       }
 
+      if (dados.preferencias) {
+        var modo = dados.preferencias.modoPaleta;
+        var cor = dados.preferencias.corPaleta;
+        if (PALETAS_MODOS[modo] && PALETAS_CORES[cor]) {
+          aplicarPaleta(modo, cor);
+        }
+      } else if (dados.estadoJogo) {
+        if (PALETAS_MODOS[estado.modoPaleta] && PALETAS_CORES[estado.corPaleta]) {
+          aplicarPaleta(estado.modoPaleta, estado.corPaleta);
+        } else if (typeof estado.paleta === "number") {
+          var pref = preferenciaPorIndiceLegado(estado.paleta);
+          aplicarPaleta(pref.modo, pref.cor);
+        }
+      }
+
       if (dados.estadoJogo) {
-        var cloudTime = dados.estadoJogo._atualizadoEm || 0;
-        var localTime = estado._atualizadoEm || 0;
-        if (cloudTime > localTime) {
-          Object.assign(estado, dados.estadoJogo);
-          estado._atualizadoEm = cloudTime;
+        var cloudState = dados.estadoJogo;
+        var dataAtual = estado.chaveData;
+        if (cloudState.chaveData === dataAtual) {
+          var cloudTime = cloudState._atualizadoEm || 0;
+          var localTime = estado._atualizadoEm || 0;
+          if (cloudTime > localTime) {
+            Object.assign(estado, cloudState);
+            estado._atualizadoEm = cloudTime;
+          } else {
+            await salvarDadosNoFirestore(uid);
+          }
         } else {
+          estado.palpites = [];
+          estado.fase = "jogando";
+          estado.letrasAtuais = ["", "", "", "", ""];
+          estado.posicaoCursor = 0;
           await salvarDadosNoFirestore(uid);
         }
       }
@@ -59,6 +84,10 @@ async function salvarDadosNoFirestore(uid) {
     var dados = {
       estatisticas: estatisticas,
       estadoJogo: { ...estado },
+      preferencias: {
+        modoPaleta: estado.modoPaleta,
+        corPaleta: estado.corPaleta,
+      },
       ultimaAtualizacao: firebase.firestore.FieldValue.serverTimestamp(),
     };
 
