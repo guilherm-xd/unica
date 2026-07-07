@@ -1,6 +1,6 @@
 # ÚNICA - Uma palavra por dia, apenas uma chance.
 
-**ÚNICA** é um jogo de palavras inspirado no Termo/Wordle, mas com uma ideia diferente: cada dia traz uma palavra única, e você tem apenas **uma única chance** de acertá-la. Se errar todas as tentativas, o jogo se bloqueia para sempre neste dispositivo.
+**ÚNICA** é um jogo de palavras inspirado no Termo/Wordle, mas com uma ideia diferente: cada dia traz uma palavra única, e você tem apenas **uma única chance** de acertá-la. Se errar todas as tentativas, o jogo se bloqueia para **sempre**.
 
 Feito para quem gosta de desafios diários e quer testar seu vocabulário de forma rápida e direta.
 
@@ -35,7 +35,7 @@ A interface foi pensada para ser limpa, com temas visuais que mudam de acordo co
 - **Progresso salvo localmente** - o jogo lembra seu estado mesmo se você fechar a página.
 - **Sincronização opcional com a nuvem** - com login Google, seus dados são salvos e sincronizados entre navegadores e dispositivos.
 - **Estatísticas detalhadas** - partidas, vitórias, sequências, distribuição de tentativas e contagem de letras.
-- **Bloqueio permanente** - se perder, a palavra do dia fica gravada e o jogo não pode mais ser jogado neste navegador.
+- **Bloqueio permanente** - se perder, a palavra do dia fica gravada e o jogo **não pode** mais ser jogado.
 
 ---
 
@@ -59,7 +59,7 @@ A interface foi pensada para ser limpa, com temas visuais que mudam de acordo co
    - 🟨 **Amarelo** = letra correta, mas na posição errada.
    - ⬜ **Cinza** = letra não está na palavra.
 5. Você tem até **6 tentativas**.
-6. Se acertar, parabéns! Se não, o jogo se bloqueia **PARA SEMPRE** neste dispositivo.
+6. Se acertar, parabéns! Se não, o jogo se bloqueia **PARA SEMPRE**.
 
 ---
 
@@ -71,7 +71,7 @@ Se quiser, você pode fazer login com sua conta Google clicando no botão "Conti
 
 ## Estatísticas
 
-O jogo mantém um registro completo da sua performance: total de partidas, taxa de vitórias, sequência atual, melhor sequência, distribuição de tentativas e contagem detalhada de letras certas, presentes e erradas. Tudo acessível pelo ícone 📊 no canto superior direito.
+O jogo mantém um registro completo da sua performance: total de partidas, taxa de vitórias, sequência atual, melhor sequência, distribuição de tentativas e contagem detalhada de letras certas, presentes e erradas. Tudo acessível pelo ícone "📊" no canto superior direito.
 
 ---
 
