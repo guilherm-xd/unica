@@ -7105,6 +7105,7 @@ const WORDS = [
   "sagui",
   "sagum",
   "saguá",
+  "sahur",
   "saial",
   "saiam",
   "saias",
