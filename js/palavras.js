@@ -5305,6 +5305,7 @@ const WORDS = [
   "múnus",
   "múrex",
   "múria",
+  "mutar",
   "múzua",
   "müsli",
   "naali",
