@@ -114,4 +114,4 @@ https://guilherm-xd.github.io/unica/
 ---
 
 ## Autor
-[Guilherme Miranda Murillo](https://github.com/guilherm-xd)
+<img src="https://github.com/guilherm-xd.png?size=24" width="24" align="absmiddle"> [Guilherme Miranda Murillo](https://github.com/guilherm-xd)
